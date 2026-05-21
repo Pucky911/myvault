@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret // ROG 保險箱</title>
+    <title>Secret // 保險箱 </title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
         
@@ -73,22 +72,22 @@
                         <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
                         <div>
                             <h1 class="font-black text-base tracking-widest text-white cyber-font">ROG VAULT</h1>
-                            <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">AUTO-DETECT.SYS</p>
+                            <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">CSV-LINK.SYS</p>
                         </div>
                     </div>
                     <div class="h-1 w-12 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] rounded-full"></div>
                 </div>
 
                 <div class="bg-[#121520] border border-slate-800 rounded p-3 mb-4 space-y-2">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest cyber-font">// DATA MIGRATION // 跨裝置遷移</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest cyber-font">// DATA MIGRATION // 試算表遷移</p>
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="exportEncryptedDB()" class="bg-white hover:bg-slate-200 text-black text-[11px] font-bold py-1.5 px-2 rounded tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                            EXPORT // 匯出
+                        <button onclick="exportToCSV()" class="bg-white hover:bg-slate-200 text-black text-[11px] font-bold py-1.5 px-2 rounded tracking-wider cyber-font text-center cursor-pointer transition-colors">
+                            EXPORT // CSV 匯出
                         </button>
                         <button onclick="document.getElementById('importFile').click()" class="border border-slate-700 hover:border-white text-white text-[11px] font-bold py-1.5 px-2 rounded tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                            IMPORT // 匯入
+                            IMPORT // CSV 匯入
                         </button>
-                        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importEncryptedDB(event)">
+                        <input type="file" id="importFile" class="hidden" accept=".csv" onchange="importFromCSV(event)">
                     </div>
                 </div>
 
@@ -122,7 +121,7 @@
 
             <div class="mt-6 p-2.5 bg-[#11131c] border border-slate-900 rounded text-[10px] text-slate-500 cyber-font flex items-center gap-2">
                 <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_6px_rgba(255,255,255,0.8)]"></span>
-                <span>INTELLIGENT RECOGNITION ACTIVE</span>
+                <span>CSV ENGINE ACTIVE</span>
             </div>
         </div>
 
@@ -172,19 +171,19 @@
     </div>
 
     <script>
-        // 🚀 【核心優化】防快取卡死機制：若更新了預設初始資料，請將版本號 +1，會全自動刷新使用者舊快取
-        const DB_VERSION = "1.0.1"; 
+        // 防快取與格式切換卡死機制
+        const DB_VERSION = "csv-1.0.2"; 
         const currentVersion = localStorage.getItem('rog_vault_version');
         
         if (currentVersion !== DB_VERSION) {
-            localStorage.removeItem('rog_cyber_storage_db'); // 清除舊版本衝突資料
+            localStorage.removeItem('rog_cyber_storage_db'); 
             localStorage.setItem('rog_vault_version', DB_VERSION);
         }
 
         let vaultData = JSON.parse(localStorage.getItem('rog_cyber_storage_db')) || [
             { id: 1, site: 'Steam Global', user: 'cyber_phantom_99', pass: 'St3am#GamerX' },
             { id: 2, site: 'Discord App', user: 'AlphaRogue_2026', pass: 'Dc!Voice_Connected' },
-            { id: 3, site: 'Google Workspace', user: 'rog_admin@gmail.com', pass: 'GooGle@Secure2026' } // 測試新增一筆
+            { id: 3, site: 'Google Workspace', user: 'rog_admin@gmail.com', pass: 'GooGle@Secure2026' }
         ];
 
         let editingId = null;
@@ -194,19 +193,124 @@
             renderVault();
         });
 
-        // 自動從帳號中的 Email 後綴辨識網站服務名稱
+        // 核心功能：匯出至 CSV (支援 Excel 中文不亂碼)
+        function exportToCSV() {
+            if (vaultData.length === 0) {
+                alert('保險箱內無任何數據可導出。');
+                return;
+            }
+
+            // 定義 CSV 標頭
+            let csvContent = "SERVICE,USERNAME,PASSWORD\n";
+
+            // 處理內容，防止密碼或帳號內含逗號或雙引號導致排版錯亂
+            vaultData.forEach(item => {
+                let row = [item.site, item.user, item.pass].map(text => {
+                    let sanitized = String(text).replace(/"/g, '""'); // 將雙引號轉義
+                    return `"${sanitized}"`; // 每一欄用雙引號包起來
+                });
+                csvContent += row.join(",") + "\n";
+            });
+
+            // 加上 \uFEFF (BOM 頭)，強迫 Excel 用 UTF-8 編碼讀取，中文才不會變亂碼
+            const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `rog_vault_backup_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // 核心功能：從 CSV 匯入 (精準 CSV 解析器)
+        function importFromCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = parseCSV(text);
+
+                    if (lines.length < 2) throw new Error("CSV 檔案內無有效數據。");
+
+                    // 檢查標頭欄位是否正確
+                    const headers = lines[0].map(h => h.trim().toUpperCase());
+                    const siteIdx = headers.indexOf("SERVICE");
+                    const userIdx = headers.indexOf("USERNAME");
+                    const passIdx = headers.indexOf("PASSWORD");
+
+                    if (siteIdx === -1 || userIdx === -1 || passIdx === -1) {
+                        throw new Error("CSV 格式不符！必須包含 SERVICE, USERNAME, PASSWORD 欄位標頭。");
+                    }
+
+                    let parsedData = [];
+                    for (let i = 1; i < lines.length; i++) {
+                        let row = lines[i];
+                        if (row.length < 3 || !row[siteIdx]) continue; // 跳過空行
+                        
+                        parsedData.push({
+                            id: Date.now() + i, // 生成唯一識別碼
+                            site: row[siteIdx].trim(),
+                            user: row[userIdx].trim(),
+                            pass: row[passIdx]
+                        });
+                    }
+
+                    if (parsedData.length > 0) {
+                        if (confirm(`成功解析！即將從 CSV 載入 ${parsedData.length} 筆憑證，是否覆蓋此裝置目前的舊資料？`)) {
+                            vaultData = parsedData;
+                            localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
+                            renderVault();
+                            alert('CSV 資料鏈結同步成功！');
+                        }
+                    } else {
+                        alert('未能從檔案中解析出有效的密碼資料。');
+                    }
+                } catch (err) {
+                    alert('匯入失敗：' + err.message);
+                }
+                event.target.value = ''; // 重置 file input
+            };
+            reader.readAsText(file, 'utf-8');
+        }
+
+        // 標準精準 CSV 雙引號與逗號解析演算法
+        function parseCSV(text) {
+            let p = '', r = [];
+            let q = false;
+            let row = [''];
+            
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                let next = text[i+1];
+                
+                if (c === '"') {
+                    if (q && next === '"') { row[row.length - 1] += '"'; i++; } // 處理雙引號轉義 ""
+                    else { q = !q; } // 切換雙引號狀態
+                } else if (c === ',' && !q) {
+                    row.push('');
+                } else if ((c === '\r' || c === '\n') && !q) {
+                    if (c === '\r' && next === '\n') { i++; }
+                    r.push(row);
+                    row = [''];
+                } else {
+                    row[row.length - 1] += c;
+                }
+            }
+            if (row.length > 1 || row[0] !== '') r.push(row);
+            return r;
+        }
+
+        // 自動從帳號中的 Email 后綴辨識網站服務名稱
         function autoDetectService(userValue) {
             const siteInput = document.getElementById('siteName');
             if (siteInput.value.trim() !== "") return;
 
             const emailDomains = {
-                'gmail.com': 'Google',
-                'yahoo.com': 'Yahoo',
-                'hotmail.com': 'Microsoft',
-                'outlook.com': 'Microsoft',
-                'icloud.com': 'Apple',
-                'facebook.com': 'Facebook',
-                'steam.com': 'Steam'
+                'gmail.com': 'Google', 'yahoo.com': 'Yahoo', 'hotmail.com': 'Microsoft',
+                'outlook.com': 'Microsoft', 'icloud.com': 'Apple', 'facebook.com': 'Facebook', 'steam.com': 'Steam'
             };
 
             if (userValue.includes('@')) {
@@ -220,82 +324,18 @@
             }
         }
 
-        // 如果使用者在服務名稱貼上網址，自動清洗成乾淨的核心名稱
+        // 清理網址輸入
         function cleanUrlInput() {
             const siteInput = document.getElementById('siteName');
             let value = siteInput.value.trim();
             if (!value) return;
 
             if (value.includes('http') || value.includes('www.') || value.includes('.com') || value.includes('.tw')) {
-                let cleaned = value
-                    .replace(/^(https?:\/\/)?(www\.)?/, '') 
-                    .split('.')[0]; 
-                
+                let cleaned = value.replace(/^(https?:\/\/)?(www\.)?/, '').split('.')[0]; 
                 if (cleaned) {
                     siteInput.value = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
                 }
             }
-        }
-
-        // 加密匯出
-        function exportEncryptedDB() {
-            if (vaultData.length === 0) {
-                alert('保險箱內無任何數據可導出。');
-                return;
-            }
-            const masterKey = prompt('請設定一組「解密主密碼」 (換裝置匯入時需輸入)：');
-            if (!masterKey) return;
-
-            try {
-                const rawString = JSON.stringify(vaultData);
-                const encryptedData = CryptoJS.AES.encrypt(rawString, masterKey).toString();
-                
-                const blob = new Blob([JSON.stringify({ vault: encryptedData })], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `rog_vault_backup_${new Date().toISOString().slice(0,10)}.json`;
-                a.click();
-                URL.revokeObjectURL(url);
-            } catch (err) {
-                alert('匯出失敗：' + err.message);
-            }
-        }
-
-        // 解密匯入
-        function importEncryptedDB(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const json = JSON.parse(e.target.result);
-                    if (!json.vault) throw new Error('無效的備份檔案格式。');
-
-                    const masterKey = prompt('請輸入此備份檔的「解密主密碼」：');
-                    if (!masterKey) return;
-
-                    const bytes = CryptoJS.AES.decrypt(json.vault, masterKey);
-                    const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-
-                    if (!decryptedText) throw new Error('密碼錯誤或檔案已損毀。');
-
-                    const parsedData = JSON.parse(decryptedText);
-                    if (Array.isArray(parsedData)) {
-                        if (confirm(`成功解密！即將載入 ${parsedData.length} 筆憑證，是否覆蓋此裝置目前的舊資料？`)) {
-                            vaultData = parsedData;
-                            localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
-                            renderVault();
-                            alert('資料鏈結同步成功！');
-                        }
-                    }
-                } catch (err) {
-                    alert('解密匯入失敗，請確認主密碼是否正確。');
-                }
-                event.target.value = '';
-            };
-            reader.readAsText(file);
         }
 
         function toggleInputPasswordVisibility() {
