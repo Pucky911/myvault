@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROG VAULT // 跨裝置電馭戰情室</title>
+    <title>ROG  // 密碼庫</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -73,7 +73,7 @@
                         <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
                         <div>
                             <h1 class="font-black text-base tracking-widest text-white cyber-font">ROG VAULT</h1>
-                            <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">PORTABLE.SYS.EXE</p>
+                            <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">AUTO-DETECT.SYS</p>
                         </div>
                     </div>
                     <div class="h-1 w-12 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] rounded-full"></div>
@@ -98,12 +98,12 @@
                 
                 <form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-3.5 text-xs">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest cyber-font">SERVICE NAME // 網站服務</label>
-                        <input type="text" id="siteName" required placeholder="Google, Steam, Discord" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest cyber-font">SERVICE NAME // 網站服務 (可輸入網址自動辨識)</label>
+                        <input type="text" id="siteName" required placeholder="Google, Steam, Discord" onblur="cleanUrlInput()" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest cyber-font">USER ID / EMAIL // 帳號</label>
-                        <input type="text" id="siteUser" required placeholder="gamer_1337@email.com" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
+                        <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest cyber-font">USER ID / EMAIL // 帳號 (輸入Email可自動帶入服務)</label>
+                        <input type="text" id="siteUser" required placeholder="gamer_1337@email.com" oninput="autoDetectService(this.value)" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-widest cyber-font">ACCESS KEY // 密碼</label>
@@ -122,7 +122,7 @@
 
             <div class="mt-4 p-2.5 bg-[#11131c] border border-slate-900 rounded text-[10px] text-slate-500 cyber-font flex items-center gap-2">
                 <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_6px_rgba(255,255,255,0.8)]"></span>
-                <span>DATA LOCK: DISCONNECTED FROM CLOUD</span>
+                <span>INTELLIGENT RECOGNITION ACTIVE</span>
             </div>
         </div>
 
@@ -182,7 +182,56 @@
             renderVault();
         });
 
-        // 核心加密匯出機制 (方案A核心)
+        // 🔥 【全新功能】自動從帳號中的 Email 後綴辨識網站服務名稱
+        function autoDetectService(userValue) {
+            const siteInput = document.getElementById('siteName');
+            // 如果使用者已經手動輸入了內容，就不強行覆蓋
+            if (siteInput.value.trim() !== "") return;
+
+            const emailDomains = {
+                'gmail.com': 'Google',
+                'yahoo.com': 'Yahoo',
+                'hotmail.com': 'Microsoft',
+                'outlook.com': 'Microsoft',
+                'icloud.com': 'Apple',
+                'facebook.com': 'Facebook',
+                'steam.com': 'Steam'
+            };
+
+            // 檢查是否包含 @ 且後續有完整的網域
+            if (userValue.includes('@')) {
+                const domain = userValue.split('@')[1].toLowerCase();
+                for (let key in emailDomains) {
+                    if (domain.includes(key)) {
+                        siteInput.value = emailDomains[key];
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 🔥 【全新功能】如果使用者在服務名稱貼上網址 (如 https://www.netflix.com)，自動清洗成乾淨的名稱
+        function cleanUrlInput() {
+            const siteInput = document.getElementById('siteName');
+            let value = siteInput.value.trim();
+            
+            if (!value) return;
+
+            // 如果偵測到網址特徵 (http, https, www, .com 等)
+            if (value.includes('http') || value.includes('www.') || value.includes('.com') || value.includes('.tw')) {
+                // 利用正規表達式抓出網域核心名字
+                let cleaned = value
+                    .replace(/^(https?:\/\/)?(www\.)?/, '') // 去掉 http://, https://, www.
+                    .split('.')[0]; // 只拿第一個點前面的核心單字
+                
+                // 首字母大寫，優化美感
+                if (cleaned) {
+                    siteInput.value = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+                }
+            }
+        }
+
+        // 核心加密匯出機制 
         function exportEncryptedDB() {
             if (vaultData.length === 0) {
                 alert('保險箱內無任何數據可導出。');
@@ -193,7 +242,6 @@
 
             try {
                 const rawString = JSON.stringify(vaultData);
-                // 使用 AES 將整份資料加密成亂碼字串
                 const encryptedData = CryptoJS.AES.encrypt(rawString, masterKey).toString();
                 
                 const blob = new Blob([JSON.stringify({ vault: encryptedData })], { type: 'application/json' });
@@ -208,7 +256,7 @@
             }
         }
 
-        // 核心解密匯入機制 (方案A核心)
+        // 核心解密匯入機制 
         function importEncryptedDB(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -222,7 +270,6 @@
                     const masterKey = prompt('請輸入此備份檔的「解密主密碼」：');
                     if (!masterKey) return;
 
-                    // 執行本地端 AES 解密
                     const bytes = CryptoJS.AES.decrypt(json.vault, masterKey);
                     const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
 
@@ -240,7 +287,7 @@
                 } catch (err) {
                     alert('解密匯入失敗，請確認主密碼是否正確。');
                 }
-                event.target.value = ''; // 清空 file input
+                event.target.value = '';
             };
             reader.readAsText(file);
         }
@@ -266,7 +313,7 @@
                 item.site.toLowerCase().includes(query) || item.user.toLowerCase().includes(query)
             );
 
-            // 自動 A-Z 0-9 排序
+            // 自動 A-Z 0-9 排序 
             filteredData.sort((a, b) => a.site.localeCompare(b.site, 'en', { numeric: true, sensitivity: 'base' }));
 
             document.getElementById('totalCount').innerText = vaultData.length;
