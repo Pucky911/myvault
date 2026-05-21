@@ -1,1 +1,454 @@
-123
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret // ROG 保險箱</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Rajdhani', 'Noto Sans TC', sans-serif;
+            background-color: #050508;
+            letter-spacing: 0.05em;
+        }
+        .rog-panel {
+            background-color: #0b0c10;
+            border: 2px solid #1f232d;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+            position: relative;
+        }
+        .rog-panel::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            width: 16px;
+            height: 16px;
+            background: #050508;
+            border-bottom: 2px solid #1f232d;
+            border-right: 2px solid #1f232d;
+            z-index: 10;
+        }
+        .rog-input {
+            font-family: 'Orbitron', monospace;
+            background-color: #10121a;
+            border: 1px solid #2a2f3d;
+            transition: all 0.2s ease;
+        }
+        .rog-input:focus {
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+            outline: none;
+        }
+        .cyber-font { font-family: 'Orbitron', monospace; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .copy-toast {
+            font-family: 'Orbitron', sans-serif;
+            animation: cyberPop 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            background: #ffffff;
+            color: #000000;
+        }
+        @keyframes cyberPop {
+            0% { opacity: 0; transform: translateY(5px) scaleX(0.8); }
+            10% { opacity: 1; transform: translateY(0) scaleX(1); }
+            90% { opacity: 1; transform: translateY(0) scaleX(1); }
+            100% { opacity: 0; transform: translateY(-4px) scaleX(0.9); }
+        }
+    </style>
+</head>
+<body class="text-slate-300 antialiased p-4 md:p-8 flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-6xl rog-panel rounded-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 min-h-[650px]">
+        
+        <div class="md:col-span-4 border-b-2 md:border-b-0 md:border-r-2 border-slate-900 p-6 flex flex-col justify-between bg-[#0e1017]">
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2.5">
+                        <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
+                        <div>
+                            <h1 class="font-black text-base tracking-widest text-white cyber-font">ROG VAULT</h1>
+                            <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">AUTO-DETECT.SYS</p>
+                        </div>
+                    </div>
+                    <div class="h-1 w-12 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] rounded-full"></div>
+                </div>
+
+                <div class="bg-[#121520] border border-slate-800 rounded p-3 mb-4 space-y-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest cyber-font">// DATA MIGRATION // 跨裝置遷移</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportEncryptedDB()" class="bg-white hover:bg-slate-200 text-black text-[11px] font-bold py-1.5 px-2 rounded tracking-wider cyber-font text-center cursor-pointer transition-colors">
+                            EXPORT // 匯出
+                        </button>
+                        <button onclick="document.getElementById('importFile').click()" class="border border-slate-700 hover:border-white text-white text-[11px] font-bold py-1.5 px-2 rounded tracking-wider cyber-font text-center cursor-pointer transition-colors">
+                            IMPORT // 匯入
+                        </button>
+                        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importEncryptedDB(event)">
+                    </div>
+                </div>
+
+                <div class="border-b border-slate-800/80 my-3"></div>
+
+                <h3 class="text-xs font-bold tracking-widest text-white mb-3 uppercase cyber-font">// FORTIFY YOUR VAULT</h3>
+                
+                <form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-3.5 text-xs">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">SERVICE NAME // 網站服務</label>
+                        <input type="text" id="siteName" required placeholder="Google, Steam, Discord" onblur="cleanUrlInput()" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">USER ID / EMAIL // 帳號</label>
+                        <input type="text" id="siteUser" required placeholder="gamer_1337@email.com" oninput="autoDetectService(this.value)" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">ACCESS KEY // 密碼</label>
+                        <div class="relative">
+                            <input type="password" id="sitePassword" required placeholder="••••••••••••" class="w-full rog-input rounded py-2 px-3 pr-10 text-slate-200 placeholder-slate-700">
+                            <button type="button" onclick="toggleInputPasswordVisibility()" class="absolute right-3 top-2.5 text-slate-500 hover:text-white transition-colors cursor-pointer">
+                                <i data-lucide="eye" id="inputPasswordEye" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-white hover:bg-slate-200 text-black py-2.5 rounded font-bold tracking-widest transition-all uppercase cyber-font flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]">
+                        STORE CREDENTIALS
+                    </button>
+                </form>
+            </div>
+
+            <div class="mt-6 p-2.5 bg-[#11131c] border border-slate-900 rounded text-[10px] text-slate-500 cyber-font flex items-center gap-2">
+                <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_6px_rgba(255,255,255,0.8)]"></span>
+                <span>INTELLIGENT RECOGNITION ACTIVE</span>
+            </div>
+        </div>
+
+        <div class="md:col-span-8 p-6 flex flex-col justify-between bg-[#0b0c10]">
+            
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div>
+                    <h2 class="text-base font-bold text-white tracking-widest uppercase cyber-font">DECRYPTED CREDENTIALS // 保險箱</h2>
+                    <p class="text-[10px] text-slate-500 mt-0.5">ALPHABETICAL ORDER // 已依服務名稱排序 (雙擊欄位可快速複製)</p>
+                </div>
+                
+                <div class="relative w-full sm:w-52">
+                    <i data-lucide="search" class="w-3.5 h-3.5 text-slate-600 absolute left-3 top-2.5"></i>
+                    <input type="text" id="searchInput" oninput="renderVault()" placeholder="SEARCH..." class="w-full rog-input rounded py-1.5 pl-8 pr-3 text-xs text-slate-200 placeholder-slate-700">
+                </div>
+            </div>
+
+            <div class="flex-1 overflow-y-auto max-h-[460px] no-scrollbar pr-1">
+                <div class="w-full border border-slate-900 bg-[#0d1017] rounded overflow-hidden">
+                    <div class="overflow-x-auto w-full">
+                        <table class="w-full text-left text-xs min-w-[500px] table-fixed">
+                            <thead class="bg-[#12151f] text-slate-400 font-bold tracking-widest uppercase border-b-2 border-slate-900 text-[10px] cyber-font">
+                                <tr>
+                                    <th class="py-3 px-3 w-[25%]">// SERVICE</th>
+                                    <th class="py-3 px-3 w-[30%]">// USERNAME</th>
+                                    <th class="py-3 px-3 w-[25%]">// PASSWORD</th>
+                                    <th class="py-3 px-3 w-[20%] text-right">// ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vaultTableBody" class="divide-y divide-slate-900">
+                                </tbody>
+                        </table>
+                    </div>
+                    
+                    <div id="emptyState" class="hidden py-24 flex flex-col items-center justify-center text-slate-700 cyber-font">
+                        <i data-lucide="unplug" class="w-8 h-8 mb-2 stroke-1"></i>
+                        <p class="text-[11px] uppercase tracking-widest">NO DATA IN LOCAL SANDBOX</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-900 flex items-center justify-between text-[11px] text-slate-600 cyber-font tracking-wider">
+                <span>LOCAL_DATABASE_LINKED_SUCCESS</span>
+                <span>TOTAL_KEYS: <span id="totalCount" class="text-white font-bold">0</span></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🚀 【核心優化】防快取卡死機制：若更新了預設初始資料，請將版本號 +1，會全自動刷新使用者舊快取
+        const DB_VERSION = "1.0.1"; 
+        const currentVersion = localStorage.getItem('rog_vault_version');
+        
+        if (currentVersion !== DB_VERSION) {
+            localStorage.removeItem('rog_cyber_storage_db'); // 清除舊版本衝突資料
+            localStorage.setItem('rog_vault_version', DB_VERSION);
+        }
+
+        let vaultData = JSON.parse(localStorage.getItem('rog_cyber_storage_db')) || [
+            { id: 1, site: 'Steam Global', user: 'cyber_phantom_99', pass: 'St3am#GamerX' },
+            { id: 2, site: 'Discord App', user: 'AlphaRogue_2026', pass: 'Dc!Voice_Connected' },
+            { id: 3, site: 'Google Workspace', user: 'rog_admin@gmail.com', pass: 'GooGle@Secure2026' } // 測試新增一筆
+        ];
+
+        let editingId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            renderVault();
+        });
+
+        // 自動從帳號中的 Email 後綴辨識網站服務名稱
+        function autoDetectService(userValue) {
+            const siteInput = document.getElementById('siteName');
+            if (siteInput.value.trim() !== "") return;
+
+            const emailDomains = {
+                'gmail.com': 'Google',
+                'yahoo.com': 'Yahoo',
+                'hotmail.com': 'Microsoft',
+                'outlook.com': 'Microsoft',
+                'icloud.com': 'Apple',
+                'facebook.com': 'Facebook',
+                'steam.com': 'Steam'
+            };
+
+            if (userValue.includes('@')) {
+                const domain = userValue.split('@')[1].toLowerCase();
+                for (let key in emailDomains) {
+                    if (domain.includes(key)) {
+                        siteInput.value = emailDomains[key];
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 如果使用者在服務名稱貼上網址，自動清洗成乾淨的核心名稱
+        function cleanUrlInput() {
+            const siteInput = document.getElementById('siteName');
+            let value = siteInput.value.trim();
+            if (!value) return;
+
+            if (value.includes('http') || value.includes('www.') || value.includes('.com') || value.includes('.tw')) {
+                let cleaned = value
+                    .replace(/^(https?:\/\/)?(www\.)?/, '') 
+                    .split('.')[0]; 
+                
+                if (cleaned) {
+                    siteInput.value = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+                }
+            }
+        }
+
+        // 加密匯出
+        function exportEncryptedDB() {
+            if (vaultData.length === 0) {
+                alert('保險箱內無任何數據可導出。');
+                return;
+            }
+            const masterKey = prompt('請設定一組「解密主密碼」 (換裝置匯入時需輸入)：');
+            if (!masterKey) return;
+
+            try {
+                const rawString = JSON.stringify(vaultData);
+                const encryptedData = CryptoJS.AES.encrypt(rawString, masterKey).toString();
+                
+                const blob = new Blob([JSON.stringify({ vault: encryptedData })], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `rog_vault_backup_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                alert('匯出失敗：' + err.message);
+            }
+        }
+
+        // 解密匯入
+        function importEncryptedDB(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    if (!json.vault) throw new Error('無效的備份檔案格式。');
+
+                    const masterKey = prompt('請輸入此備份檔的「解密主密碼」：');
+                    if (!masterKey) return;
+
+                    const bytes = CryptoJS.AES.decrypt(json.vault, masterKey);
+                    const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
+
+                    if (!decryptedText) throw new Error('密碼錯誤或檔案已損毀。');
+
+                    const parsedData = JSON.parse(decryptedText);
+                    if (Array.isArray(parsedData)) {
+                        if (confirm(`成功解密！即將載入 ${parsedData.length} 筆憑證，是否覆蓋此裝置目前的舊資料？`)) {
+                            vaultData = parsedData;
+                            localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
+                            renderVault();
+                            alert('資料鏈結同步成功！');
+                        }
+                    }
+                } catch (err) {
+                    alert('解密匯入失敗，請確認主密碼是否正確。');
+                }
+                event.target.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        function toggleInputPasswordVisibility() {
+            const input = document.getElementById('sitePassword');
+            const icon = document.getElementById('inputPasswordEye');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        // 渲染列表
+        function renderVault() {
+            const tbody = document.getElementById('vaultTableBody');
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filteredData = vaultData.filter(item => 
+                item.site.toLowerCase().includes(query) || item.user.toLowerCase().includes(query)
+            );
+
+            filteredData.sort((a, b) => a.site.localeCompare(b.site, 'en', { numeric: true, sensitivity: 'base' }));
+
+            document.getElementById('totalCount').innerText = vaultData.length;
+            tbody.innerHTML = '';
+
+            if(filteredData.length === 0) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                return;
+            } else {
+                document.getElementById('emptyState').classList.add('hidden');
+            }
+
+            filteredData.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-[#141824] transition-colors group border-l-2 border-transparent hover:border-white';
+                
+                if (editingId === item.id) {
+                    tr.innerHTML = `
+                        <td class="py-2 px-3">
+                            <input type="text" id="edit-site-${item.id}" value="${item.site}" class="w-full bg-[#1b1f2b] border border-white/40 rounded py-1 px-2 text-xs text-white focus:outline-none font-bold">
+                        </td>
+                        <td class="py-2 px-3">
+                            <input type="text" id="edit-user-${item.id}" value="${item.user}" class="w-full bg-[#1b1f2b] border border-white/40 rounded py-1 px-2 text-xs text-white focus:outline-none">
+                        </td>
+                        <td class="py-2 px-3 cyber-font">
+                            <input type="text" id="edit-pass-${item.id}" value="${item.pass}" class="w-full bg-[#1b1f2b] border border-white/40 rounded py-1 px-2 text-xs text-white focus:outline-none">
+                        </td>
+                        <td class="py-2 px-3 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <button onclick="saveEdit(${item.id})" class="text-white hover:scale-110 transition-transform cursor-pointer"><i data-lucide="check-square" class="w-4 h-4"></i></button>
+                                <button onclick="cancelEdit()" class="text-slate-500 hover:text-white transition-colors cursor-pointer"><i data-lucide="x-square" class="w-4 h-4"></i></button>
+                            </div>
+                        </td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td class="py-3 px-3 font-bold text-white truncate">${item.site}</td>
+                        <td class="py-3 px-3 text-slate-400 truncate relative cursor-pointer select-none" ondblclick="inlineCopy(this, '${item.user}', 'ID')">
+                            <span class="hover:text-white transition-colors">${item.user}</span>
+                        </td>
+                        <td class="py-3 px-3 cyber-font relative cursor-pointer select-none" ondblclick="inlineCopy(this, '${item.pass}', 'KEY')">
+                            <div class="flex items-center gap-2">
+                                <input type="password" id="pw-${item.id}" value="${item.pass}" readonly class="bg-transparent border-none text-slate-500 focus:outline-none w-24 text-xs tracking-widest pointer-events-none select-none">
+                                <button onclick="event.stopPropagation(); toggleRowPassword(${item.id})" class="text-slate-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"><i data-lucide="eye" id="eye-${item.id}" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </td>
+                        <td class="py-3 px-3 text-right">
+                            <div class="flex items-center justify-end gap-1 sm:opacity-40 group-hover:opacity-100 transition-opacity">
+                                <button onclick="startEdit(${item.id})" class="p-1 hover:bg-slate-900 rounded text-slate-400 hover:text-white transition-all cursor-pointer" title="編輯"><i data-lucide="edit-3" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="directCopy('${item.pass}', 'KEY')" class="p-1 hover:bg-slate-900 rounded text-slate-400 hover:text-white transition-all cursor-pointer" title="複製密碼"><i data-lucide="copy" class="w-3.5 h-3.5"></i></button>
+                                <button onclick="deleteCredential(${item.id})" class="p-1 hover:bg-slate-900 rounded text-slate-400 hover:text-white transition-all cursor-pointer" title="刪除"><i data-lucide="trash" class="w-3.5 h-3.5"></i></button>
+                            </div>
+                        </td>
+                    `;
+                }
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function startEdit(id) { editingId = id; renderVault(); }
+        function cancelEdit() { editingId = null; renderVault(); }
+
+        function saveEdit(id) {
+            const newSite = document.getElementById(`edit-site-${id}`).value.trim();
+            const newUser = document.getElementById(`edit-user-${id}`).value.trim();
+            const newPass = document.getElementById(`edit-pass-${id}`).value;
+
+            if (!newSite || !newUser || !newPass) return;
+
+            const targetIndex = vaultData.findIndex(item => item.id === id);
+            if (targetIndex !== -1) {
+                vaultData[targetIndex].site = newSite;
+                vaultData[targetIndex].user = newUser;
+                vaultData[targetIndex].pass = newPass;
+                localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
+            }
+            editingId = null;
+            renderVault();
+        }
+
+        function inlineCopy(element, text, label) {
+            if (editingId !== null) return;
+            navigator.clipboard.writeText(text);
+            if (element.querySelector('.copy-toast')) return;
+
+            const toast = document.createElement('span');
+            toast.className = 'copy-toast absolute left-3 top-1/2 -translate-y-1/2 text-[9px] font-black px-1.5 py-0.5 rounded shadow-lg z-10 uppercase tracking-widest';
+            toast.innerText = `[${label}_COPIED]`;
+            element.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 1000);
+        }
+
+        function directCopy(text, label) {
+            navigator.clipboard.writeText(text);
+            alert(`[SUCCESS] ${label} 已導向至系統剪貼簿。`);
+        }
+
+        function toggleRowPassword(id) {
+            const input = document.getElementById(`pw-${id}`);
+            const icon = document.getElementById(`eye-${id}`);
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.setAttribute('data-lucide', input.type === 'password' ? 'eye' : 'eye-off');
+            lucide.createIcons();
+        }
+
+        function saveCredentials(e) {
+            e.preventDefault();
+            const site = document.getElementById('siteName').value.trim();
+            const user = document.getElementById('siteUser').value.trim();
+            const pass = document.getElementById('sitePassword').value;
+
+            vaultData.push({ id: Date.now(), site, user, pass });
+            localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
+            renderVault();
+            
+            document.getElementById('vaultForm').reset();
+            document.getElementById('sitePassword').type = 'password';
+            document.getElementById('inputPasswordEye').setAttribute('data-lucide', 'eye');
+            lucide.createIcons();
+        }
+
+        function deleteCredential(id) {
+            if(confirm('CRITICAL: 確定要永久銷毀此憑證防線嗎？')) {
+                vaultData = vaultData.filter(item => item.id !== id);
+                localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
+                renderVault();
+            }
+        }
+    </script>
+</body>
+</html>
