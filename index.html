@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret // 保險箱 </title>
+    <title>Secret // ROG 保險箱 (Drive 雲端同步版)</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://apis.google.com/js/api.js" async defer></script>
+    
+    <script src="https://apis.google.com/js/api.js" async defer onload="gapiLoad()"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer onload="gisLoad()"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
         
@@ -73,7 +75,7 @@
                     <div class="flex items-center gap-2.5">
                         <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
                         <div>
-                            <h1 class="font-black text-base tracking-widest text-white cyber-font">PUCKY VAULT</h1>
+                            <h1 class="font-black text-base tracking-widest text-white cyber-font">ROG VAULT</h1>
                             <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">DRIVE-SYNC.SYS</p>
                         </div>
                     </div>
@@ -88,10 +90,10 @@
                         </button>
                         <div class="grid grid-cols-2 gap-2">
                             <button onclick="exportToChromeCSV()" class="bg-white hover:bg-slate-200 text-black text-[10px] font-bold py-1.5 px-2 rounded tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                                匯出
+                                匯出 CHROME CSV
                             </button>
                             <button onclick="document.getElementById('importFile').click()" class="border border-slate-700 hover:border-white text-white text-[10px] font-bold py-1.5 px-2 rounded tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                                匯入
+                                匯入 CHROME CSV
                             </button>
                             <input type="file" id="importFile" class="hidden" accept=".csv" onchange="importFromChromeCSV(event)">
                         </div>
@@ -104,11 +106,11 @@
                 
                 <form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-3.5 text-xs">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">name // 網站服務名稱 </label>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">name // 網站服務名稱</label>
                         <input type="text" id="siteName" required placeholder="Google, Steam, Netflix" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">url // 登入網址 (可選，留空則自動補齊)</label>
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">url // 登入網址 (可選)</label>
                         <input type="text" id="siteUrl" placeholder="https://google.com" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
                     </div>
                     <div>
@@ -141,7 +143,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <div>
                     <h2 class="text-base font-bold text-white tracking-widest uppercase cyber-font">DECRYPTED CREDENTIALS // 保險箱</h2>
-                    <p class="text-[10px] text-slate-500 mt-0.5">PASSWORD STANDARD //  (雙擊欄位快速複製)</p>
+                    <p class="text-[10px] text-slate-500 mt-0.5">CHROME PASSWORD STANDARD // 已依名稱排序 (雙擊欄位快速複製)</p>
                 </div>
                 
                 <div class="relative w-full sm:w-52">
@@ -185,7 +187,6 @@
         // 🔒 請在下方替換成你從 Google Cloud Console 申請到的 用戶端 ID
         const CLIENT_ID = '420264907247-hvtrma6b2upt6l7eio5gj6n3hj2s63se.apps.googleusercontent.com';
         
-        // 僅請求 appDataFolder 權限，確保安全隔離，使用者看不到此隱藏資料夾
         const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
         const FILE_NAME = 'rog_vault_chrome_db.json';
 
@@ -197,32 +198,34 @@
 
         let editingId = null;
 
+        // 🚀 移除了原有的 gapiLoad() 直接呼叫，改為等待頁面與外部腳本都完成
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             renderVault();
-            // 初始化 Google 載入模組
-            gapiLoad();
-            gisLoad();
         });
 
         // --- Google Drive 自動聯網與認證模組 ---
-        function gapiLoad() { gapi.load('client', initializeGapiClient); }
+        function gapiLoad() { 
+            gapi.load('client', initializeGapiClient); 
+        }
+        
         async function initializeGapiClient() {
             await gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'] });
             gapiInited = true;
             maybeEnableAuth();
         }
+        
         function gisLoad() {
             tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID, scope: SCOPES, callback: '', // 稍後動態分配
+                client_id: CLIENT_ID, scope: SCOPES, callback: '', 
             });
             gisiInited = true;
             maybeEnableAuth();
         }
+        
         function maybeEnableAuth() {
             if (gapiInited && gisiInited) {
                 document.getElementById('authBtn').innerText = "CONNECT TO GOOGLE DRIVE";
-                // 🚀 自動嘗試靜態讀取已存在瀏覽器的 Token，達到「打開就全自動嘗試聯動」
                 const savedToken = JSON.parse(localStorage.getItem('gdrive_token'));
                 if (savedToken && savedToken.expires_at > Date.now()) {
                     gapi.client.setToken(savedToken);
@@ -232,15 +235,17 @@
         }
 
         function handleAuthClick() {
+            if(!gisiInited || !gapiInited) {
+                alert("Google 同步模組尚未載入完成，請稍候再試。");
+                return;
+            }
             tokenClient.callback = async (resp) => {
                 if (resp.error !== undefined) throw (resp);
-                // 儲存憑證
                 resp.expires_at = Date.now() + (resp.expires_in * 1000);
                 localStorage.setItem('gdrive_token', JSON.stringify(resp));
                 await onDriveConnected();
             };
 
-            // 如果沒有憑證或過期，跳出登入選擇視窗
             if (gapi.client.getToken() === null) {
                 tokenClient.requestAccessToken({prompt: 'select_account'});
             } else {
@@ -257,31 +262,26 @@
             await syncWithGoogleDrive();
         }
 
-        // --- 核心雲端資料庫儲存與建立機制 ---
         async function syncWithGoogleDrive() {
             try {
-                // 1. 去雲端硬碟的專用隱藏區查找有無對應的檔案
                 const response = await gapi.client.drive.files.list({
                     spaces: 'appDataFolder', q: `name = '${FILE_NAME}'`, fields: 'files(id, name)'
                 });
                 const files = response.result.files;
 
                 if (files.length > 0) {
-                    // 2. 檔案存在，下載下來與本地合併
                     driveFileId = files[0].id;
                     const fileData = await gapi.client.drive.files.get({ fileId: driveFileId, alt: 'media' });
                     let cloudData = fileData.result;
                     if (typeof cloudData === 'string' && cloudData.trim()) cloudData = JSON.parse(cloudData);
                     
                     if (Array.isArray(cloudData) && cloudData.length > 0) {
-                        // 合併邏輯：以雲端為主，補齊本地沒有的
                         let localIds = new Set(vaultData.map(v => v.id));
                         cloudData.forEach(c => { if(!localIds.has(c.id)) vaultData.push(c); });
                         localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
                         renderVault();
                     }
                 } else {
-                    // 3. 檔案不存在，自動在 Drive 裡面建立一個新的空檔案
                     await saveToGoogleDrive(true);
                 }
             } catch (err) {
@@ -319,19 +319,14 @@
                 }
                 const res = await request;
                 if (isCreate && res.result.id) driveFileId = res.result.id;
-                console.log("雲端資料同步更新完畢");
             } catch (err) {
                 console.error("上傳至雲端失敗", err);
             }
         }
 
-        // --- 核心功能：對齊 Chrome 密碼匯出 CSV 格式 (name, url, username, password) ---
         function exportToChromeCSV() {
             if (vaultData.length === 0) { alert('無任何數據可導出。'); return; }
-            
-            // 🚀 Chrome 官方標準 4 欄位標頭
             let csvContent = "name,url,username,password\n";
-
             vaultData.forEach(item => {
                 let fallbackUrl = item.url || `https://${item.site.toLowerCase().split(' ')[0]}.com`;
                 let row = [item.site, fallbackUrl, item.user, item.pass].map(text => {
@@ -340,7 +335,6 @@
                 });
                 csvContent += row.join(",") + "\n";
             });
-
             const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -350,7 +344,6 @@
             URL.revokeObjectURL(url);
         }
 
-        // 核心功能：解析並匯入 Chrome 匯出的 CSV 檔案
         function importFromChromeCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -387,12 +380,11 @@
                     }
 
                     if (parsedData.length > 0) {
-                        if (confirm(`成功解析！已讀取到 ${parsedData.length} 筆符合 Chrome 規範的憑證，是否將其寫入保險箱？`)) {
+                        if (confirm(`成功解析！已讀取到 ${parsedData.length} 筆憑證，是否寫入保險箱？`)) {
                             vaultData = parsedData;
                             localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
                             renderVault();
-                            // 全自動將最新狀態同步備份到 Google Drive 隱藏夾
-                            saveToGoogleDrive();
+                            saveToGoogleDrive(); 
                             alert('Chrome 資料鏈結同步完成！');
                         }
                     }
@@ -497,7 +489,7 @@
                 vaultData[targetIndex].user = newUser;
                 vaultData[targetIndex].pass = newPass;
                 localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
-                saveToGoogleDrive(); // 即時向雲端備份同步
+                saveToGoogleDrive(); 
             }
             editingId = null; renderVault();
         }
@@ -530,7 +522,7 @@
             vaultData.push({ id: Date.now(), site, url, user, pass });
             localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
             renderVault();
-            saveToGoogleDrive(); // 即時備份至 Drive
+            saveToGoogleDrive(); 
             
             document.getElementById('vaultForm').reset();
             document.getElementById('sitePassword').type = 'password';
@@ -543,7 +535,7 @@
                 vaultData = vaultData.filter(item => item.id !== id);
                 localStorage.setItem('rog_cyber_storage_db', JSON.stringify(vaultData));
                 renderVault();
-                saveToGoogleDrive(); // 即時更新雲端
+                saveToGoogleDrive(); 
             }
         }
     </script>
