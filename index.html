@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SECURE VAULT // PUCKY 保險箱</title>
+    <title>ROG STRIX SECURE VAULT // PUCKY 保險箱</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -14,55 +14,40 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap');
         
-        /* 核心賽博龐克霓虹色調 */
+        /* 核心賽博龐克色調 - 灰階與藍色調 */
         :root {
             --depth-bg: #03040c;
             --main-panel: #060814;
-            --neon-pink: #ff007f;
             --neon-blue: #00e0ff;
             --neon-red: #ff3c00;
-            --neon-purple: #9d00ff;
             --metal-edge: #1c223a;
-            --shadow-core: rgba(0, 0, 0, 0.9);
+            --metal-light: #4b5563;
         }
 
         body {
             font-family: 'Rajdhani', 'Noto Sans TC', sans-serif;
-            background-color: var(--depth-bg);
-            background-image: 
-                linear-gradient(135deg, var(--main-panel) 25%, transparent 25%),
-                linear-gradient(225deg, var(--main-panel) 25%, transparent 25%),
-                linear-gradient(45deg, var(--main-panel) 25%, transparent 25%),
-                linear-gradient(315deg, var(--main-panel) 25%, var(--depth-bg) 25%);
-            background-position: 10px 0, 10px 0, 0 0, 0 0;
-            background-size: 20px 20px;
-            background-repeat: repeat;
             letter-spacing: 0.05em;
             color: #d1d5db;
+            /* --- 🚀 關鍵修改：將背景改為你上傳的原始圖片 --- */
+            background-color: var(--depth-bg); /* 基礎色 */
+            background-image: url('background.jpg'); /* ⚠️ 請務必將圖片命名為此檔名，並上傳 */
+            background-size: cover; /* 圖片覆蓋整個視窗不變形 */
+            background-position: center center; /* 圖片居中 */
+            background-repeat: no-repeat; /* 不重複 */
+            /* --- 🚀 關鍵修改結束 --- */
         }
 
         .rog-panel {
-            background-color: var(--main-panel);
+            /* 面板加一點透明度，透出背景圖 */
+            background-color: rgba(6, 8, 20, 0.9);
             border: 2px solid var(--metal-edge);
-            box-shadow: 0 0 50px rgba(157, 0, 255, 0.2), 0 0 10px rgba(0, 224, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 224, 255, 0.05);
             position: relative;
             overflow: hidden;
-        }
-        
-        /* 賽博龐克霓虹點陣裝飾牆 */
-        .rog-panel::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image: 
-                radial-gradient(var(--neon-purple) 0.5px, transparent 0.5px);
-            background-size: 10px 10px;
-            opacity: 0.05;
-            z-index: -1;
+            backdrop-filter: blur(5px); /* 面板內模糊，提升可讀性 */
         }
 
-        /* 介面霓虹線條和幾何圖形 */
+        /* 介面邊角裝飾 */
         .rog-panel::before {
             content: '';
             position: absolute;
@@ -71,7 +56,7 @@
             width: 16px;
             height: 16px;
             background: var(--depth-bg);
-            border-bottom: 2px solid var(--neon-pink);
+            border-bottom: 2px solid var(--metal-light);
             border-right: 2px solid var(--neon-blue);
             z-index: 10;
         }
@@ -83,28 +68,20 @@
             transition: all 0.2s ease;
             color: #fff;
         }
+        
         .rog-input:focus {
-            border-color: var(--neon-pink);
-            box-shadow: 0 0 15px rgba(255, 0, 127, 0.3), 0 0 5px rgba(0, 224, 255, 0.2);
+            border-color: #ffffff;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
             outline: none;
         }
 
-        /* 霓虹文字樣式 */
-        .neon-text-pink {
-            color: var(--neon-pink);
-            text-shadow: 0 0 10px rgba(255, 0, 127, 0.8), 0 0 2px #fff;
-        }
         .neon-text-blue {
             color: var(--neon-blue);
             text-shadow: 0 0 10px rgba(0, 224, 255, 0.8), 0 0 2px #fff;
         }
-        .neon-text-red {
-            color: var(--neon-red);
-            text-shadow: 0 0 10px rgba(255, 60, 0, 0.8), 0 0 2px #fff;
-        }
+        
         .cyber-font { font-family: 'Orbitron', monospace; }
 
-        /* 霓虹按鈕樣式 (金屬質感與霓虹光暈) */
         .neon-button {
             position: relative;
             background: linear-gradient(135deg, #2a2e45 0%, #1c223a 100%);
@@ -112,52 +89,11 @@
             color: #fff;
             overflow: hidden;
             transition: all 0.3s ease;
-            box-shadow: 0 0 10px rgba(0, 224, 255, 0.3);
         }
         .neon-button:hover {
             background: linear-gradient(135deg, #3a3e55 0%, #2c324a 100%);
-            box-shadow: 0 0 20px rgba(0, 224, 255, 0.6), 0 0 5px rgba(255, 0, 127, 0.3);
+            border-color: #fff;
             transform: translateY(-1px);
-        }
-        .neon-button::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 224, 255, 0.4), transparent);
-            transition: all 0.6s ease;
-        }
-        .neon-button:hover::after {
-            left: 100%;
-        }
-
-        /* 霓虹點陣裝飾牆上的若隱若現文字和圖案 */
-        .cyber-detail {
-            position: absolute;
-            font-family: 'Orbitron', monospace;
-            font-weight: 900;
-            opacity: 0.05;
-            user-select: none;
-            z-index: -2;
-        }
-        .cyber-detail-1 {
-            top: 10%; left: 5%;
-            font-size: 8rem;
-            color: var(--neon-pink);
-            text-shadow: 0 0 5px var(--neon-pink);
-        }
-        .cyber-detail-2 {
-            top: 50%; left: -20%;
-            font-size: 12rem;
-            color: var(--neon-blue);
-            text-shadow: 0 0 5px var(--neon-blue);
-            transform: rotate(-90deg);
-        }
-        .cyber-detail-3 {
-            bottom: 5%; right: 5%;
-            font-size: 6rem;
-            color: var(--neon-red);
-            text-shadow: 0 0 5px var(--neon-red);
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -165,41 +101,60 @@
         
         /* 鎖定畫面專用動畫和樣式 */
         #lockScreen {
-            backdrop-filter: blur(15px) saturate(180%);
+            backdrop-filter: blur(20px) saturate(180%); /* 增加模糊度 */
             transition: opacity 0.5s ease, visibility 0.5s;
         }
         .glitch-text {
-            animation: glitch 1.5s infinite linear alternate-reverse;
+            animation: glitch 2s infinite linear alternate-reverse;
         }
         @keyframes glitch {
             0% { text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue); }
-            20% { text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-blue); }
-            40% { text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue); }
-            60% { text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-blue); }
-            80% { text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue); }
+            10% { text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-blue); }
+            20% { text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue); }
             100% { text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-blue); }
+        }
+        
+        /* 預設的 CSS X Logo (防破圖用) */
+        .fallback-x-logo {
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 45deg at 50% 50%, #fff 90deg, #000 90deg 180deg, #fff 180deg 270deg, #000 270deg 360deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .fallback-x-logo::after {
+            content: "X";
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #888;
+            mix-blend-mode: difference;
         }
     </style>
 </head>
 <body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
-    <div class="cyber-detail cyber-detail-1">ROG</div>
-    <div class="cyber-detail cyber-detail-2">STRIX</div>
-    <div class="cyber-detail cyber-detail-3">GAMER /206</div>
 
     <div class="w-full max-w-6xl rog-panel rounded-xl overflow-hidden relative min-h-[650px] flex">
         
-        <div id="lockScreen" class="absolute inset-0 z-50 bg-[var(--depth-bg)]/95 flex flex-col items-center justify-center p-6">
-            <div class="max-w-md w-full bg-[var(--main-panel)] border border-[var(--metal-edge)] p-8 rounded-xl shadow-[0_0_60px_rgba(157,0,255,0.4),0_0_10px_rgba(0,224,255,0.1)] text-center relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[var(--neon-pink)] via-[var(--neon-blue)] to-[var(--neon-red)]"></div>
+        <div id="lockScreen" class="absolute inset-0 z-50 bg-[var(--depth-bg)]/90 flex flex-col items-center justify-center p-6">
+            <div class="max-w-md w-full bg-[var(--main-panel)] border border-[var(--metal-edge)] p-8 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.8),0_0_10px_rgba(0,224,255,0.1)] text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-500 via-white to-slate-500"></div>
                 
-                <div class="w-24 h-24 mx-auto mb-6 flex items-center justify-center">
-                                 
-                <h2 id="lockTitle" class="text-3xl font-black neon-text-pink tracking-widest cyber-font mb-3 glitch-text">SYSTEM LOCKED</h2>
+                <div class="w-24 h-24 mx-auto mb-6 relative">
+                    <img src="pucky-vault-logo-cyber.png" alt="PUCKY VAULT Secured Logo" class="w-full h-full object-contain relative z-10" 
+                         onerror="this.style.display='none'; document.getElementById('fallbackLogo').style.display='flex';">
+                    <div id="fallbackLogo" class="fallback-x-logo absolute inset-0 hidden shadow-[0_0_15px_rgba(255,255,255,0.2)]"></div>
+                </div>
+                
+                <h2 id="lockTitle" class="text-3xl font-black text-white tracking-widest cyber-font mb-3 glitch-text">SYSTEM LOCKED</h2>
                 <p id="lockDesc" class="text-xs text-slate-400 mb-8 tracking-widest uppercase">請輸入軍規解密主鑰以開啟保險箱</p>
                 
                 <form onsubmit="handleUnlock(event)" class="space-y-5">
                     <input type="password" id="masterKeyInput" required placeholder="MASTER KEY..." class="w-full rog-input rounded-md py-3.5 px-5 text-center text-white placeholder-slate-700 tracking-widest text-xl font-bold">
-                    <button type="submit" class="w-full neon-button py-3.5 rounded-md font-black tracking-widest transition-all uppercase cyber-font text-lg cursor-pointer">
+                    <button type="submit" class="w-full neon-button py-3.5 rounded-md font-black tracking-widest transition-all uppercase cyber-font text-lg cursor-pointer hover:bg-slate-800">
                         DECRYPT // 解密存取
                     </button>
                 </form>
@@ -207,18 +162,18 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-12 w-full">
-            <div class="md:col-span-4 border-b-2 md:border-b-0 md:border-r-2 border-slate-900 p-6 flex flex-col justify-between bg-[#080a18]">
+        <div class="grid grid-cols-1 md:grid-cols-12 w-full relative z-10">
+            <div class="md:col-span-4 border-b-2 md:border-b-0 md:border-r-2 border-slate-900 p-6 flex flex-col justify-between bg-[#080a18]/90 backdrop-blur-sm">
                 <div>
                     <div class="flex items-center justify-between mb-7">
                         <div class="flex items-center gap-2.5">
                             <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
                             <div>
-                                <h1 class="font-black text-lg tracking-widest neon-text-pink cyber-font">PUCKY VAULT</h1>
+                                <h1 class="font-black text-lg tracking-widest text-white cyber-font">PUCKY VAULT</h1>
                                 <p class="text-[11px] neon-text-blue tracking-widest uppercase cyber-font">AES-256 SECURED</p>
                             </div>
                         </div>
-                        <div class="h-1.5 w-14 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] rounded-full"></div>
+                        <div class="h-1.5 w-14 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)] rounded-full"></div>
                     </div>
 
                     <div class="bg-[var(--main-panel)] border border-[var(--metal-edge)] rounded-md p-4 mb-5 space-y-3 shadow-inner">
@@ -233,34 +188,34 @@
                                 </button>
                                 <button onclick="document.getElementById('importFile').click()" class="border border-[var(--metal-edge)] hover:border-white text-white text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
                                     匯入 CSV
-                                )</button>
+                                </button>
                                 <input type="file" id="importFile" class="hidden" accept=".csv" onchange="importFromChromeCSV(event)">
                             </div>
-                            <button onclick="changeMasterKey()" class="w-full border border-[var(--metal-edge)] hover:border-[var(--neon-purple)] hover:bg-[var(--neon-purple)]/10 neon-text-blue text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-                                <i data-lucide="key" class="w-4 h-4"></i> CHANGE MASTER KEY // 修改主鑰
+                            <button onclick="changeMasterKey()" class="w-full border border-[var(--metal-edge)] hover:border-white text-slate-300 hover:text-white text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5">
+                                <i data-lucide="key" class="w-4 h-4"></i> CHANGE MASTER KEY
                             </button>
                         </div>
                     </div>
 
                     <div class="border-b border-slate-900 my-4"></div>
 
-                    <h3 class="text-xs font-bold tracking-widest neon-text-pink mb-4 uppercase cyber-font">// FORTIFY YOUR VAULT</h3>
+                    <h3 class="text-xs font-bold tracking-widest text-slate-300 mb-4 uppercase cyber-font">// FORTIFY YOUR VAULT</h3>
                     
                     <form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-4 text-xs">
                         <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">name // 網站服務名稱</label>
+                            <label class="block text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest cyber-font">name // 網站服務名稱</label>
                             <input type="text" id="siteName" required placeholder="Google, Steam, Netflix" class="w-full rog-input rounded-md py-2.5 px-4 text-slate-200 placeholder-slate-700">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">url // 登入網址 (可選)</label>
+                            <label class="block text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest cyber-font">url // 登入網址 (可選)</label>
                             <input type="text" id="siteUrl" placeholder="https://google.com" class="w-full rog-input rounded-md py-2.5 px-4 text-slate-200 placeholder-slate-700">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">username // 帳號</label>
+                            <label class="block text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest cyber-font">username // 帳號</label>
                             <input type="text" id="siteUser" required placeholder="gamer_1337@email.com" class="w-full rog-input rounded-md py-2.5 px-4 text-slate-200 placeholder-slate-700">
                         </div>
                         <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">password // 密碼</label>
+                            <label class="block text-[11px] font-bold text-slate-400 mb-1.5 uppercase tracking-widest cyber-font">password // 密碼</label>
                             <div class="relative">
                                 <input type="password" id="sitePassword" required placeholder="••••••••••••" class="w-full rog-input rounded-md py-2.5 px-4 pr-11 text-slate-200 placeholder-slate-700 tracking-widest font-bold">
                                 <button type="button" onclick="toggleInputPasswordVisibility()" class="absolute right-3.5 top-3 text-slate-500 hover:text-white transition-colors cursor-pointer">
@@ -280,11 +235,11 @@
                 </div>
             </div>
 
-            <div class="md:col-span-8 p-6 flex flex-col justify-between bg-[var(--main-panel)]">
+            <div class="md:col-span-8 p-6 flex flex-col justify-between bg-[var(--main-panel)]/80 backdrop-blur-sm">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-5">
                     <div>
                         <h2 class="text-lg font-bold text-white tracking-widest uppercase cyber-font">DECRYPTED CREDENTIALS // 金庫密碼 </h2>
-                        <p class="text-[11px] neon-text-blue mt-1 uppercase">CHROME CSV STANDARD // <span class="font-black text-white">(雙擊帳密可快速複製)</span></p>
+                        <p class="text-[11px] text-slate-400 mt-1 uppercase">CHROME CSV STANDARD // <span class="font-black text-slate-300">(雙擊帳密可快速複製)</span></p>
                     </div>
                     
                     <div class="relative w-full sm:w-60">
@@ -293,11 +248,11 @@
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto max-h-[460px] no-scrollbar pr-2">
+                <div class="flex-1 overflow-y-auto max-h-[460px] no-scrollbar pr-2 relative z-20">
                     <div class="w-full border border-slate-900 bg-[#0d101d] rounded-md overflow-hidden">
                         <div class="overflow-x-auto w-full">
                             <table class="w-full text-left text-xs min-w-[550px] table-fixed">
-                                <thead class="bg-[#12151f] neon-text-pink font-bold tracking-widest uppercase border-b-2 border-slate-900 text-[11px] cyber-font">
+                                <thead class="bg-[#12151f]/90 text-slate-400 font-bold tracking-widest uppercase border-b-2 border-slate-900 text-[11px] cyber-font">
                                     <tr>
                                         <th class="py-3.5 px-4 w-[25%]">// SERVICE</th>
                                         <th class="py-3.5 px-4 w-[30%]">// USERNAME</th>
@@ -311,8 +266,8 @@
                         </div>
                         
                         <div id="emptyState" class="hidden py-28 flex flex-col items-center justify-center text-slate-700 cyber-font">
-                            <i data-lucide="unplug" class="w-10 h-10 mb-3 stroke-1 neon-text-blue opacity-30"></i>
-                            <p class="text-[12px] uppercase tracking-widest neon-text-blue opacity-30">NO DATA FOUND</p>
+                            <i data-lucide="unplug" class="w-10 h-10 mb-3 stroke-1 text-slate-600 opacity-30"></i>
+                            <p class="text-[12px] uppercase tracking-widest text-slate-600 opacity-30">NO DATA FOUND</p>
                         </div>
                     </div>
                 </div>
@@ -353,15 +308,12 @@
             const lockDesc = document.getElementById('lockDesc');
             
             if (!rawData) {
-                // 完全沒有資料：首次使用
                 lockTitle.innerText = "INITIALIZE VAULT";
                 lockDesc.innerText = "初次使用，請設定一組全新的主密碼 (遺失將無法復原)";
             } else if (rawData.trim().startsWith('[')) {
-                // 有資料，但是舊版的明文 (JSON Array)：提示升級加密
                 lockTitle.innerText = "ENCRYPTION UPGRADE";
                 lockDesc.innerText = "偵測到舊版明文資料，請設定主密碼進行軍規加密升級";
             } else {
-                // 有資料且是密文：正常解密
                 lockTitle.innerText = "SYSTEM LOCKED";
                 lockDesc.innerText = "請輸入軍規解密主鑰以開啟保險箱";
             }
@@ -374,13 +326,11 @@
             const errorMsg = document.getElementById('lockError');
 
             if (!rawData || rawData.trim().startsWith('[')) {
-                // 首次設定 或 舊版明文升級
                 masterKey = inputKey;
                 vaultData = rawData ? JSON.parse(rawData) : [];
-                saveDataToStorage(); // 這一行會將資料變成密文存入
+                saveDataToStorage(); 
                 unlockSuccess();
             } else {
-                // 嘗試解密現有密文
                 try {
                     const parsed = JSON.parse(rawData);
                     const bytes = CryptoJS.AES.decrypt(parsed.encryptedVault, inputKey);
@@ -404,7 +354,6 @@
             renderVault();
         }
 
-        // 修改主密碼引擎
         function changeMasterKey() {
             if (!masterKey) {
                 alert("❌ 系統錯誤：保險箱尚未解鎖，無法修改主鑰。");
@@ -412,7 +361,7 @@
             }
 
             const newKey1 = prompt("🔑 【步驟 1/2】請輸入您要變更的全新的主密碼：\n\n(注意：修改後舊密碼將失效，請務必牢記新密碼)");
-            if (!newKey1) return; // 使用者按取消
+            if (!newKey1) return; 
 
             const newKey2 = prompt("🔑 【步驟 2/2】請「再次輸入」全新主密碼以確認：");
             if (newKey1 !== newKey2) {
@@ -425,20 +374,15 @@
                 return;
             }
 
-            // 更新記憶體中的主鑰
             masterKey = newKey1;
-            
-            // 強制用新密碼重新加密本地硬碟，並觸發雲端同步上傳
             saveDataToStorage();
             
             alert("✅ 主密碼修改成功！您的所有資料已使用全新金鑰重新加密，並已發送同步指令至雲端。");
         }
 
-        // 核心寫入函數：所有變更都必須透過這支函數，確保資料隨時加密
         function saveDataToStorage() {
             if (!masterKey) return;
             const encryptedString = CryptoJS.AES.encrypt(JSON.stringify(vaultData), masterKey).toString();
-            // 包裝成 JSON 存入，未來擴充較方便
             localStorage.setItem('rog_cyber_storage_db', JSON.stringify({ encryptedVault: encryptedString }));
             saveToGoogleDrive();
         }
@@ -525,13 +469,12 @@
                                     }
                                 });
                                 vaultData = Array.from(localDataMap.values());
-                                // 合併後再次加密寫入 Local
                                 const encryptedString = CryptoJS.AES.encrypt(JSON.stringify(vaultData), masterKey).toString();
                                 localStorage.setItem('rog_cyber_storage_db', JSON.stringify({ encryptedVault: encryptedString }));
                                 renderVault();
                             }
                         } catch(e) {
-                            console.error("雲端解密失敗：可能使用了不同的主密碼", e);
+                            console.error("雲端解密失敗", e);
                             alert("❌ 警告：雲端備份的資料似乎使用了不同的主密碼，本次無法合併雲端資料。");
                         }
                     }
@@ -556,7 +499,6 @@
                 const close_delim = `\r\n--${boundary}--`;
                 const metadata = { 'name': FILE_NAME, 'parents': isCreate ? ['appDataFolder'] : undefined };
                 
-                // 上傳加密後的字串
                 const encryptedString = CryptoJS.AES.encrypt(JSON.stringify(vaultData), masterKey).toString();
                 const uploadPayload = { encryptedVault: encryptedString };
 
@@ -593,7 +535,6 @@
             }
         }
 
-        // --- 📊 UI 與操作功能 ---
         function exportToChromeCSV() {
             if (vaultData.length === 0) { alert('❌ 無任何數據可導出。'); return; }
             let csvContent = "name,url,username,password\n";
@@ -636,7 +577,7 @@
                     if (parsedData.length > 0) {
                         if (confirm(`✅ 成功解析！已讀取到 ${parsedData.length} 筆憑證，是否加密寫入保險箱？`)) {
                             parsedData.forEach(pd => vaultData.push(pd));
-                            saveDataToStorage(); // 統一呼叫加密存檔
+                            saveDataToStorage(); 
                         }
                     }
                 } catch (err) { alert('❌ 匯入失敗：' + err.message); }
@@ -686,7 +627,7 @@
 
             filteredData.forEach(item => {
                 const tr = document.createElement('tr');
-                tr.className = 'hover:bg-[#141824] transition-colors group border-l-2 border-transparent hover:border-[var(--neon-pink)]';
+                tr.className = 'hover:bg-[#141824] transition-colors group border-l-2 border-transparent hover:border-white';
                 
                 if (editingId === item.id) {
                     tr.innerHTML = `
@@ -699,7 +640,7 @@
                         <td class="py-2.5 px-4 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <button onclick="saveEdit(${item.id})" class="text-white hover:scale-110 transition-transform cursor-pointer"><i data-lucide="check-square" class="w-4.5 h-4.5"></i></button>
-                                <button onclick="cancelEdit()" class="text-slate-500 hover:neon-text-red transition-colors cursor-pointer"><i data-lucide="x-square" class="w-4.5 h-4.5"></i></button>
+                                <button onclick="cancelEdit()" class="text-slate-500 hover:text-white transition-colors cursor-pointer"><i data-lucide="x-square" class="w-4.5 h-4.5"></i></button>
                             </div>
                         </td>
                     `;
@@ -707,23 +648,23 @@
                     let siteDisplay = `<span class="font-bold text-white truncate">${item.site}</span>`;
                     if(item.url) {
                         let safeUrl = item.url.startsWith('http') ? item.url : `https://${item.url}`;
-                        siteDisplay += `<a href="${safeUrl}" target="_blank" title="前往網站" class="ml-2 text-slate-500 hover:neon-text-blue inline-block transition-colors"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>`;
+                        siteDisplay += `<a href="${safeUrl}" target="_blank" title="前往網站" class="ml-2 text-slate-500 hover:text-white inline-block transition-colors"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>`;
                     }
 
                     tr.innerHTML = `
                         <td class="py-3.5 px-4 flex items-center">${siteDisplay}</td>
-                        <td class="py-3.5 px-4 neon-text-blue truncate relative cursor-pointer select-none" ondblclick="inlineCopy(this, '${item.user}', 'ID')"><span>${item.user}</span></td>
+                        <td class="py-3.5 px-4 text-slate-300 truncate relative cursor-pointer select-none" ondblclick="inlineCopy(this, '${item.user}', 'ID')"><span>${item.user}</span></td>
                         <td class="py-3.5 px-4 cyber-font relative cursor-pointer select-none" ondblclick="inlineCopy(this, '${item.pass}', 'KEY')">
                             <div class="flex items-center gap-2.5">
-                                <input type="password" id="pw-${item.id}" value="${item.pass}" readonly class="bg-transparent border-none text-slate-500 focus:outline-none w-28 text-xs tracking-widest pointer-events-none select-none font-bold">
+                                <input type="password" id="pw-${item.id}" value="${item.pass}" readonly class="bg-transparent border-none text-slate-400 focus:outline-none w-28 text-xs tracking-widest pointer-events-none select-none font-bold">
                                 <button onclick="event.stopPropagation(); toggleRowPassword(${item.id})" class="text-slate-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"><i data-lucide="eye" id="eye-${item.id}" class="w-4 h-4"></i></button>
                             </div>
                         </td>
                         <td class="py-3.5 px-4 text-right">
                             <div class="flex items-center justify-end gap-1.5 sm:opacity-40 group-hover:opacity-100 transition-opacity">
-                                <button onclick="startEdit(${item.id})" class="p-1.5 hover:bg-slate-900 rounded-md neon-text-blue hover:text-white transition-all cursor-pointer" title="編輯"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
-                                <button onclick="directCopy('${item.pass}', 'KEY')" class="p-1.5 hover:bg-slate-900 rounded-md neon-text-blue hover:text-white transition-all cursor-pointer" title="複製密碼"><i data-lucide="copy" class="w-4 h-4"></i></button>
-                                <button onclick="deleteCredential(${item.id})" class="p-1.5 hover:bg-slate-900 rounded-md neon-text-red hover:text-white transition-all cursor-pointer" title="刪除"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                                <button onclick="startEdit(${item.id})" class="p-1.5 hover:bg-slate-900 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer" title="編輯"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                                <button onclick="directCopy('${item.pass}', 'KEY')" class="p-1.5 hover:bg-slate-900 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer" title="複製密碼"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                <button onclick="deleteCredential(${item.id})" class="p-1.5 hover:bg-slate-900 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer" title="刪除"><i data-lucide="trash" class="w-4 h-4"></i></button>
                             </div>
                         </td>
                     `;
@@ -750,7 +691,7 @@
                 vaultData[targetIndex].user = newUser;
                 vaultData[targetIndex].pass = newPass;
                 vaultData[targetIndex].updatedAt = Date.now();
-                saveDataToStorage(); // 加密存檔
+                saveDataToStorage(); 
             }
             editingId = null; renderVault();
         }
@@ -781,7 +722,7 @@
             const pass = document.getElementById('sitePassword').value;
 
             vaultData.push({ id: Date.now(), site, url, user, pass, updatedAt: Date.now() });
-            saveDataToStorage(); // 加密存檔
+            saveDataToStorage(); 
             
             document.getElementById('vaultForm').reset();
             document.getElementById('sitePassword').type = 'password';
@@ -792,7 +733,7 @@
         function deleteCredential(id) {
             if(confirm('🚨 確定要永久刪除此憑證嗎？此操作不可逆！')) {
                 vaultData = vaultData.filter(item => item.id !== id);
-                saveDataToStorage(); // 加密存檔
+                saveDataToStorage(); 
             }
         }
     </script>
