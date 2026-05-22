@@ -54,7 +54,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0;
-            width: 100%; hieght: 100%;
+            width: 100%; height: 100%;
             background-image: 
                 radial-gradient(var(--neon-purple) 0.5px, transparent 0.5px);
             background-size: 10px 10px;
@@ -227,15 +227,15 @@
                             </button>
                             <div class="grid grid-cols-2 gap-2.5">
                                 <button onclick="exportToChromeCSV()" class="bg-white hover:bg-slate-200 text-black text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                                    匯出 CSV
+                                    匯出
                                 </button>
                                 <button onclick="document.getElementById('importFile').click()" class="border border-[var(--metal-edge)] hover:border-white text-white text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                                    匯入 CSV
-                                )</button>
+                                    匯入
+                                </button>
                                 <input type="file" id="importFile" class="hidden" accept=".csv" onchange="importFromChromeCSV(event)">
                             </div>
                             <button onclick="changeMasterKey()" class="w-full border border-[var(--metal-edge)] hover:border-[var(--neon-purple)] hover:bg-[var(--neon-purple)]/10 neon-text-blue text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-                                <i data-lucide="key" class="w-4 h-4"></i> CHANGE MASTER KEY // 修改主鑰
+                                <i data-lucide="key" class="w-4 h-4"></i> CHANGE MASTER KEY // 修改主金鑰
                             </button>
                         </div>
                     </div>
@@ -317,7 +317,7 @@
 
                 <div class="mt-5 pt-4 border-t border-slate-900 flex items-center justify-between text-[12px] text-slate-600 cyber-font tracking-wider">
                     <span>SECURE_SESSION_ENCRYPTED</span>
-                    <span>TOTAL_KEYS: <span class="font-bold text-white">0</span></span>
+                    <span>TOTAL_KEYS: <span id="totalCount" class="font-bold text-white">0</span></span>
                 </div>
             </div>
         </div>
@@ -353,15 +353,15 @@
             if (!rawData) {
                 // 完全沒有資料：首次使用
                 lockTitle.innerText = "INITIALIZE VAULT";
-                lockDesc.innerText = "初次使用，請設定一組 Traditional Chinese 主密碼 (遺失將無法復原)";
+                lockDesc.innerText = "初次使用，請設定一組全新的主密碼 (遺失將無法復原)";
             } else if (rawData.trim().startsWith('[')) {
                 // 有資料，但是舊版的明文 (JSON Array)：提示升級加密
                 lockTitle.innerText = "ENCRYPTION UPGRADE";
-                lockDesc.innerText = "偵測到舊版明文資料，請設定主密碼進行 Traditional Chinese 軍規加密升級";
+                lockDesc.innerText = "偵測到舊版明文資料，請設定主密碼進行軍規加密升級";
             } else {
                 // 有資料且是密文：正常解密
                 lockTitle.innerText = "SYSTEM LOCKED";
-                lockDesc.innerText = "請輸入 Traditional Chinese 軍規解密主鑰以開啟保險箱";
+                lockDesc.innerText = "請輸入軍規解密主鑰以開啟保險箱";
             }
         }
 
@@ -409,7 +409,7 @@
                 return;
             }
 
-            const newKey1 = prompt("🔑 【步驟 1/2】請輸入 Traditional Chinese 全新主密碼：\n\n(注意：修改後舊密碼將失效，請務必牢記新密碼)");
+            const newKey1 = prompt("🔑 【步驟 1/2】請輸入全新的主密碼：\n\n(注意：修改後舊密碼將失效，請務必牢記新密碼)");
             if (!newKey1) return; // 使用者按取消
 
             const newKey2 = prompt("🔑 【步驟 2/2】請「再次輸入」全新主密碼以確認：");
@@ -429,7 +429,7 @@
             // 強制用新密碼重新加密本地硬碟，並觸發雲端同步上傳
             saveDataToStorage();
             
-            alert("✅ Traditional Chinese 主密碼修改成功！您的所有資料已使用全新金鑰重新加密，並已發送同步指令至雲端。");
+            alert("✅ 主密碼修改成功！您的所有資料已使用全新金鑰重新加密，並已發送同步指令至雲端。");
         }
 
         // 核心寫入函數：所有變更都必須透過這支函數，確保資料隨時加密
@@ -466,7 +466,7 @@
 
         function handleAuthClick() {
             if(!gisiInited || !gapiInited) { alert("Google 同步模組尚未載入完成，請稍候再試。"); return; }
-            if(!masterKey) { alert("Traditional Chinese 請先解鎖本機保險箱！"); return; }
+            if(!masterKey) { alert("請先解鎖本機保險箱！"); return; }
 
             tokenClient.callback = async (resp) => {
                 if (resp.error !== undefined) throw (resp);
@@ -593,7 +593,7 @@
 
         // --- 📊 UI 與操作功能 ---
         function exportToChromeCSV() {
-            if (vaultData.length === 0) { alert('❌ Traditional Chinese 無任何數據可導出。'); return; }
+            if (vaultData.length === 0) { alert('❌ 無任何數據可導出。'); return; }
             let csvContent = "name,url,username,password\n";
             vaultData.forEach(item => {
                 let fallbackUrl = item.url || `https://${item.site.toLowerCase().split(' ')[0]}.com`;
@@ -615,10 +615,10 @@
             reader.onload = function(e) {
                 try {
                     const lines = parseCSV(e.target.result);
-                    if (lines.length < 2) throw new Error("Traditional Chinese CSV 檔案內無有效數據。");
+                    if (lines.length < 2) throw new Error("❌ CSV 檔案內無有效數據。");
                     const headers = lines[0].map(h => h.trim().toLowerCase());
                     const nameIdx = headers.indexOf("name"), urlIdx = headers.indexOf("url"), userIdx = headers.indexOf("username"), passIdx = headers.indexOf("password");
-                    if (nameIdx === -1 || userIdx === -1 || passIdx === -1) throw new Error("Traditional Chinese 格式不符！請確認這是標準的 Chrome CSV。");
+                    if (nameIdx === -1 || userIdx === -1 || passIdx === -1) throw new Error("❌ 格式不符！請確認這是標準的 Chrome CSV。");
 
                     let parsedData = [];
                     for (let i = 1; i < lines.length; i++) {
@@ -632,12 +632,12 @@
                     }
 
                     if (parsedData.length > 0) {
-                        if (confirm(`✅ Traditional Chinese 成功解析！已讀取到 ${parsedData.length} 筆憑證，是否加密寫入保險箱？`)) {
+                        if (confirm(`✅ 成功解析！已讀取到 ${parsedData.length} 筆憑證，是否加密寫入保險箱？`)) {
                             parsedData.forEach(pd => vaultData.push(pd));
                             saveDataToStorage(); // 統一呼叫加密存檔
                         }
                     }
-                } catch (err) { alert('❌ Traditional Chinese 匯入失敗：' + err.message); }
+                } catch (err) { alert('❌ 匯入失敗：' + err.message); }
                 event.target.value = '';
             };
             reader.readAsText(file, 'utf-8');
@@ -670,7 +670,11 @@
             const query = document.getElementById('searchInput').value.toLowerCase();
             let filteredData = vaultData.filter(item => item.site.toLowerCase().includes(query) || item.user.toLowerCase().includes(query));
             filteredData.sort((a, b) => a.site.localeCompare(b.site, 'en', { numeric: true, sensitivity: 'base' }));
-            document.querySelector('.TOTAL_KEYS + span').innerText = vaultData.length;
+            
+            // 🐛 Bug 關鍵修復點：使用 ID 抓取元素
+            const countElement = document.getElementById('totalCount');
+            if (countElement) countElement.innerText = vaultData.length;
+            
             tbody.innerHTML = '';
 
             if(filteredData.length === 0) {
@@ -756,7 +760,7 @@
             if (element.querySelector('.copy-toast')) return;
             const toast = document.createElement('span');
             toast.className = 'copy-toast absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black bg-white text-black px-2 py-1 rounded shadow-lg z-10 uppercase tracking-widest';
-            toast.innerText = `✅ Traditional Chinese [${label}_COPIED]`;
+            toast.innerText = `✅ [${label}_COPIED]`;
             element.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 1200);
         }
@@ -785,7 +789,7 @@
         }
 
         function deleteCredential(id) {
-            if(confirm('🚨 Traditional Chinese 確定要永久刪除此憑證嗎？此操作不可逆！')) {
+            if(confirm('🚨 確定要永久刪除此憑證嗎？此操作不可逆！')) {
                 vaultData = vaultData.filter(item => item.id !== id);
                 saveDataToStorage(); // 加密存檔
             }
