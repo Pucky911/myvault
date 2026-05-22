@@ -216,7 +216,7 @@
                                 <p class="text-[11px] neon-text-blue tracking-widest uppercase cyber-font">AES-256 SECURED</p>
                             </div>
                         </div>
-                        <div class="h-1.5 w-14 bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] rounded-full"></div>
+                        <div class="h-1.5 w-14 bg-[#262626] shadow-[0_0_10px_rgba(255,255,255,0.8)] rounded-full"></div>
                     </div>
 
                     <div class="bg-[var(--main-panel)] border border-[var(--metal-edge)] rounded-md p-4 mb-5 space-y-3 shadow-inner">
@@ -226,7 +226,7 @@
                                 <i data-lucide="log-in" class="w-4 h-4"></i> CONNECT GOOGLE DRIVE
                             </button>
                             <div class="grid grid-cols-2 gap-2.5">
-                                <button onclick="exportToChromeCSV()" class="bg-white hover:bg-slate-200 text-black text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
+                                <button onclick="exportToChromeCSV()" class="bg-[#262626] hover:bg-slate-200 text-black text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
                                     匯出 REMIT
                                 </button>
                                 <button onclick="document.getElementById('importFile').click()" class="border border-[var(--metal-edge)] hover:border-white text-white text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
@@ -261,7 +261,7 @@
         <label class="block text-[10px] font-bold text-[#a3a3a3] mb-1 uppercase tracking-widest">// password // 密碼</label>
         <input type="password" id="sitePassword" required placeholder="••••••••••••" class="w-full custom-input rounded py-2 px-3 text-[#e5e5e5] placeholder-[#404040]">
     </div>
-    <button type="submit" class="w-full btn-metal py-2.5 rounded font-bold uppercase transition-colors text-white">STORE</button>
+    <button type="submit" class="w-full btn-metal py-2.5 rounded font-bold uppercase transition-colors text-white">ADD NEW</button>
 </form>
                 </div>
 
@@ -752,7 +752,7 @@
             navigator.clipboard.writeText(text);
             if (element.querySelector('.copy-toast')) return;
             const toast = document.createElement('span');
-            toast.className = 'copy-toast absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black bg-white text-black px-2 py-1 rounded shadow-lg z-10 uppercase tracking-widest';
+            toast.className = 'copy-toast absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black bg-[#262626] text-black px-2 py-1 rounded shadow-lg z-10 uppercase tracking-widest';
             toast.innerText = `✅ [${label}_COPIED]`;
             element.appendChild(toast);
             setTimeout(() => { toast.remove(); }, 1200);
@@ -772,12 +772,20 @@
             const user = document.getElementById('siteUser').value.trim();
             const pass = document.getElementById('sitePassword').value;
 
+            // 1. 新增資料
             vaultData.push({ id: Date.now(), site, url, user, pass, updatedAt: Date.now() });
-            saveDataToStorage(); // 加密存檔
             
+            // 2. 加密存檔 (同時同步到 Google Drive)
+            saveDataToStorage(); 
+            
+            // 3. 🚀 關鍵優化：直接更新畫面，不用刷新網頁
+            renderVault();
+            
+            // 4. 清空輸入框
             document.getElementById('vaultForm').reset();
             document.getElementById('sitePassword').type = 'password';
-            document.getElementById('inputPasswordEye').setAttribute('data-lucide', 'eye');
+            
+            // 5. 若有使用 Lucide 圖示，重新渲染一次
             lucide.createIcons();
         }
 
