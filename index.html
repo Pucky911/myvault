@@ -184,7 +184,7 @@
 <body class="p-4 md:p-8 flex items-center justify-center min-h-screen">
     <div class="cyber-detail cyber-detail-1">ROG</div>
     <div class="cyber-detail cyber-detail-2">STRIX</div>
-    <div class="cyber-detail cyber-detail-3">GAMER /206</div>
+    <div class="cyber-detail cyber-detail-3">GAMER /1206</div>
 
     <div class="w-full max-w-6xl rog-panel rounded-xl overflow-hidden relative min-h-[650px] flex">
         
@@ -212,7 +212,7 @@
                         <div class="flex items-center gap-2.5">
                             <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
                             <div>
-                                <h1 class="font-black text-lg tracking-widest neon-text-pink cyber-font">ROG STRIX Vault</h1>
+                                <h1 class="font-black text-lg tracking-widest neon-text-pink cyber-font">George Vault</h1>
                                 <p class="text-[11px] neon-text-blue tracking-widest uppercase cyber-font">AES-256 SECURED</p>
                             </div>
                         </div>
@@ -227,10 +227,10 @@
                             </button>
                             <div class="grid grid-cols-2 gap-2.5">
                                 <button onclick="exportToChromeCSV()" class="bg-white hover:bg-slate-200 text-black text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                                    匯出 CSV
+                                    匯出 REMIT
                                 </button>
                                 <button onclick="document.getElementById('importFile').click()" class="border border-[var(--metal-edge)] hover:border-white text-white text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
-                                    匯入 CSV
+                                    匯入 IMPORT
                                 </button>
                                 <input type="file" id="importFile" class="hidden" accept=".csv" onchange="importFromChromeCSV(event)">
                             </div>
@@ -244,32 +244,25 @@
 
                     <h3 class="text-xs font-bold tracking-widest neon-text-pink mb-4 uppercase cyber-font">// FORTIFY YOUR VAULT</h3>
                     
-                    <form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-4 text-xs">
-                        <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">name // 網站服務名稱</label>
-                            <input type="text" id="siteName" required placeholder="Google, Steam, Netflix" class="w-full rog-input rounded-md py-2.5 px-4 text-slate-200 placeholder-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">url // 登入網址 (可選)</label>
-                            <input type="text" id="siteUrl" placeholder="https://google.com" class="w-full rog-input rounded-md py-2.5 px-4 text-slate-200 placeholder-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">username // 帳號</label>
-                            <input type="text" id="siteUser" required placeholder="gamer_1337@email.com" class="w-full rog-input rounded-md py-2.5 px-4 text-slate-200 placeholder-slate-700">
-                        </div>
-                        <div>
-                            <label class="block text-[11px] font-bold neon-text-pink mb-1.5 uppercase tracking-widest cyber-font">password // 密碼</label>
-                            <div class="relative">
-                                <input type="password" id="sitePassword" required placeholder="••••••••••••" class="w-full rog-input rounded-md py-2.5 px-4 pr-11 text-slate-200 placeholder-slate-700 tracking-widest font-bold">
-                                <button type="button" onclick="toggleInputPasswordVisibility()" class="absolute right-3.5 top-3 text-slate-500 hover:text-white transition-colors cursor-pointer">
-                                    <i data-lucide="eye" id="inputPasswordEye" class="w-4.5 h-4.5"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full neon-button py-3 rounded-md font-black tracking-widest transition-all uppercase cyber-font text-lg cursor-pointer">
-                            STORE CREDENTIALS
-                        </button>
-                    </form>
+<form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-4 text-xs">
+    <div>
+        <label class="block text-[10px] font-bold text-[#a3a3a3] mb-1 uppercase tracking-widest">// name // 網站服務名稱</label>
+        <input type="text" id="siteName" required placeholder="Google, Steam, Netflix" class="w-full custom-input rounded py-2 px-3 text-[#e5e5e5] placeholder-[#404040]">
+    </div>
+    <div>
+        <label class="block text-[10px] font-bold text-[#a3a3a3] mb-1 uppercase tracking-widest">// url // 登入網址 (可選)</label>
+        <input type="text" id="siteUrl" placeholder="https://google.com" class="w-full custom-input rounded py-2 px-3 text-[#e5e5e5] placeholder-[#404040]">
+    </div>
+    <div>
+        <label class="block text-[10px] font-bold text-[#a3a3a3] mb-1 uppercase tracking-widest">// username // 帳號</label>
+        <input type="text" id="siteUser" required placeholder="gamer_1337@email.com" class="w-full custom-input rounded py-2 px-3 text-[#e5e5e5] placeholder-[#404040]">
+    </div>
+    <div>
+        <label class="block text-[10px] font-bold text-[#a3a3a3] mb-1 uppercase tracking-widest">// password // 密碼</label>
+        <input type="password" id="sitePassword" required placeholder="••••••••••••" class="w-full custom-input rounded py-2 px-3 text-[#e5e5e5] placeholder-[#404040]">
+    </div>
+    <button type="submit" class="w-full btn-metal py-2.5 rounded font-bold uppercase transition-colors text-white">STORE</button>
+</form>
                 </div>
 
                 <div class="mt-7 p-3 bg-[#0b0e1e] border border-slate-900 rounded-md text-[11px] text-slate-500 cyber-font flex items-center gap-2.5 shadow-inner">
