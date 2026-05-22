@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secret // ROG 保險箱 (即時預測版)</title>
+    <title>Secret // ROG 保險箱 (外網即時預測版)</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -46,12 +46,6 @@
         .cyber-font { font-family: 'Orbitron', monospace; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        
-        /* 稍微優化瀏覽器預設 datalist 在暗色系下的融合度 */
-        datalist {
-            background-color: #10121a;
-            color: #fff;
-        }
 
         .copy-toast {
             font-family: 'Orbitron', sans-serif;
@@ -78,7 +72,7 @@
                         <i data-lucide="terminal" class="w-5 h-5 text-white"></i>
                         <div>
                             <h1 class="font-black text-base tracking-widest text-white cyber-font">ROG VAULT</h1>
-                            <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">PREDICT-LINK.SYS</p>
+                            <p class="text-[10px] text-slate-500 tracking-widest uppercase cyber-font">LIVE-FETCH.SYS</p>
                         </div>
                     </div>
                     <div class="h-1 w-12 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] rounded-full"></div>
@@ -103,28 +97,10 @@
                 
                 <form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-3.5 text-xs">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">SERVICE NAME // 網站服務 (輸入英文字母即時預測)</label>
-                        <input type="text" id="siteName" required autocomplete="off" list="services" placeholder="輸入 g、n、d 試試看..." onblur="cleanUrlInput()" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
+                        <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">SERVICE NAME // 網站服務 (聯網即時爬取)</label>
+                        <input type="text" id="siteName" required autocomplete="off" list="liveServices" placeholder="輸入字元觸網即時爬取..." onblur="cleanUrlInput()" oninput="fetchLiveCompanies(this.value)" class="w-full rog-input rounded py-2 px-3 text-slate-200 placeholder-slate-700">
                         
-                        <datalist id="services">
-                            <option value="Google">
-                            <option value="GitHub">
-                            <option value="GitLab">
-                            <option value="Garena">
-                            <option value="NextBank (將來銀行)">
-                            <option value="Netflix">
-                            <option value="Nintendo (任天堂)">
-                            <option value="Discord">
-                            <option value="Steam">
-                            <option value="Spotify">
-                            <option value="Facebook">
-                            <option value="Microsoft">
-                            <option value="Apple">
-                            <option value="OpenAI">
-                            <option value="LINE Bank">
-                            <option value="KGI Securities (凱基證券)">
-                            <option value="TSMC (台積電)">
-                        </datalist>
+                        <datalist id="liveServices"></datalist>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase tracking-widest cyber-font">USER ID / EMAIL // 帳號</label>
@@ -147,7 +123,7 @@
 
             <div class="mt-6 p-2.5 bg-[#11131c] border border-slate-900 rounded text-[10px] text-slate-500 cyber-font flex items-center gap-2">
                 <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_6px_rgba(255,255,255,0.8)]"></span>
-                <span>DYNAMIC SUGGESTION ACTIVE</span>
+                <span id="engineStatus">LIVE API LINK ACTIVE</span>
             </div>
         </div>
 
@@ -197,7 +173,7 @@
     </div>
 
     <script>
-        const DB_VERSION = "csv-suggest-1.0.4"; 
+        const DB_VERSION = "live-fetch-1.0.5"; 
         const currentVersion = localStorage.getItem('rog_vault_version');
         
         if (currentVersion !== DB_VERSION) {
@@ -212,11 +188,62 @@
         ];
 
         let editingId = null;
+        let debounceTimer = null; // 防抖定時器
 
         document.addEventListener('DOMContentLoaded', () => {
             lucide.createIcons();
             renderVault();
         });
+
+        // 🧠 【終極核心】外網即時聯網爬取與自動建議生成
+        function fetchLiveCompanies(query) {
+            const datalist = document.getElementById('liveServices');
+            const statusIndicator = document.getElementById('engineStatus');
+            
+            let val = query.trim();
+            
+            // 如果輸入長度小於 2 個字，先不啟動外網請求以免浪費流量
+            if (val.length < 2) {
+                datalist.innerHTML = '';
+                return;
+            }
+
+            // 清除前一次打字的定時器 (防抖動機制)
+            clearTimeout(debounceTimer);
+
+            debounceTimer = setTimeout(() => {
+                statusIndicator.innerText = "SEARCHING GLOBAL DATA...";
+                statusIndicator.classList.add("text-white");
+
+                // 呼叫全球公開免密鑰公司自動建議 API
+                fetch(`https://autocomplete.clearbit.com/v1/companies/suggest?query=${encodeURIComponent(val)}`)
+                    .then(response => {
+                        if (!response.ok) throw new Error("Network error");
+                        return response.json();
+                    })
+                    .then(data => {
+                        datalist.innerHTML = ''; // 清空舊的下拉內容
+                        
+                        if (data && data.length > 0) {
+                            data.forEach(company => {
+                                const option = document.createElement('option');
+                                // 將公司名稱與官方網址包在一起作為預測選項
+                                option.value = `${company.name} (${company.domain})`;
+                                datalist.appendChild(option);
+                            });
+                            statusIndicator.innerText = "DATA RETRIEVED LINKED";
+                        } else {
+                            statusIndicator.innerText = "NO MATCHING GLOBAL BRAND";
+                        }
+                        statusIndicator.classList.remove("text-white");
+                    })
+                    .catch(err => {
+                        console.error("API Fetch Error:", err);
+                        statusIndicator.innerText = "OFFLINE OR API LIMIT REACHED";
+                        statusIndicator.classList.remove("text-white");
+                    });
+            }, 300); // 停頓 300ms 後才發動請求
+        }
 
         // 如果使用者直接「貼網址」，移開時全自動過濾去雜質
         function cleanUrlInput() {
@@ -225,11 +252,7 @@
             if (!value) return;
 
             if (value.includes('http') || value.includes('www.') || value.includes('.com') || value.includes('.tw') || value.includes('.net') || value.includes('.org')) {
-                let cleaned = value
-                    .replace(/^(https?:\/\/)?(www\.)?/, '') 
-                    .split('/')[0] 
-                    .split('.')[0]; 
-                
+                let cleaned = value.replace(/^(https?:\/\/)?(www\.)?/, '').split('/')[0].split('.')[0]; 
                 if (cleaned) {
                     siteInput.value = cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
                 }
