@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>  SECURE VAULT // PUCKY 保險箱</title>
+    <title>ROG STRIX SECURE VAULT // PUCKY 保險箱</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
@@ -629,4 +629,117 @@
             }
 
             filteredData.forEach(item => {
-                const tr
+                const tr = document.createElement('tr');
+                // 懸停時的邊框改為白色/淺灰色
+                tr.className = 'hover:bg-[#141824] transition-colors group border-l-2 border-transparent hover:border-white';
+                
+                if (editingId === item.id) {
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-4 flex flex-col gap-1.5">
+                            <input type="text" id="edit-site-${item.id}" value="${item.site}" placeholder="服務名稱" class="w-full rog-input rounded-md py-1.5 px-3 text-xs text-white focus:outline-none font-bold">
+                            <input type="text" id="edit-url-${item.id}" value="${item.url || ''}" placeholder="URL" class="w-full rog-input rounded-md py-1.5 px-3 text-[11px] text-slate-400 focus:outline-none">
+                        </td>
+                        <td class="py-2.5 px-4"><input type="text" id="edit-user-${item.id}" value="${item.user}" class="w-full rog-input rounded-md py-1.5 px-3 text-xs text-white focus:outline-none"></td>
+                        <td class="py-2.5 px-4 cyber-font"><input type="text" id="edit-pass-${item.id}" value="${item.pass}" class="w-full rog-input rounded-md py-1.5 px-3 text-xs text-white focus:outline-none font-bold tracking-widest"></td>
+                        <td class="py-2.5 px-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button onclick="saveEdit(${item.id})" class="text-white hover:scale-110 transition-transform cursor-pointer"><i data-lucide="check-square" class="w-4.5 h-4.5"></i></button>
+                                <button onclick="cancelEdit()" class="text-slate-500 hover:text-white transition-colors cursor-pointer"><i data-lucide="x-square" class="w-4.5 h-4.5"></i></button>
+                            </div>
+                        </td>
+                    `;
+                } else {
+                    let siteDisplay = `<span class="font-bold text-white truncate">${item.site}</span>`;
+                    if(item.url) {
+                        let safeUrl = item.url.startsWith('http') ? item.url : `https://${item.url}`;
+                        siteDisplay += `<a href="${safeUrl}" target="_blank" title="前往網站" class="ml-2 text-slate-500 hover:text-white inline-block transition-colors"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>`;
+                    }
+
+                    tr.innerHTML = `
+                        <td class="py-3.5 px-4 flex items-center">${siteDisplay}</td>
+                        <td class="py-3.5 px-4 text-slate-300 truncate relative cursor-pointer select-none" ondblclick="inlineCopy(this, '${item.user}', 'ID')"><span>${item.user}</span></td>
+                        <td class="py-3.5 px-4 cyber-font relative cursor-pointer select-none" ondblclick="inlineCopy(this, '${item.pass}', 'KEY')">
+                            <div class="flex items-center gap-2.5">
+                                <input type="password" id="pw-${item.id}" value="${item.pass}" readonly class="bg-transparent border-none text-slate-400 focus:outline-none w-28 text-xs tracking-widest pointer-events-none select-none font-bold">
+                                <button onclick="event.stopPropagation(); toggleRowPassword(${item.id})" class="text-slate-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"><i data-lucide="eye" id="eye-${item.id}" class="w-4 h-4"></i></button>
+                            </div>
+                        </td>
+                        <td class="py-3.5 px-4 text-right">
+                            <div class="flex items-center justify-end gap-1.5 sm:opacity-40 group-hover:opacity-100 transition-opacity">
+                                <button onclick="startEdit(${item.id})" class="p-1.5 hover:bg-slate-900 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer" title="編輯"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                                <button onclick="directCopy('${item.pass}', 'KEY')" class="p-1.5 hover:bg-slate-900 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer" title="複製密碼"><i data-lucide="copy" class="w-4 h-4"></i></button>
+                                <button onclick="deleteCredential(${item.id})" class="p-1.5 hover:bg-slate-900 rounded-md text-slate-400 hover:text-white transition-all cursor-pointer" title="刪除"><i data-lucide="trash" class="w-4 h-4"></i></button>
+                            </div>
+                        </td>
+                    `;
+                }
+                tbody.appendChild(tr);
+            });
+            lucide.createIcons();
+        }
+
+        function startEdit(id) { editingId = id; renderVault(); }
+        function cancelEdit() { editingId = null; renderVault(); }
+
+        function saveEdit(id) {
+            const newSite = document.getElementById(`edit-site-${id}`).value.trim();
+            const newUrl = document.getElementById(`edit-url-${id}`).value.trim();
+            const newUser = document.getElementById(`edit-user-${id}`).value.trim();
+            const newPass = document.getElementById(`edit-pass-${id}`).value;
+            if (!newSite || !newUser || !newPass) return;
+
+            const targetIndex = vaultData.findIndex(item => item.id === id);
+            if (targetIndex !== -1) {
+                vaultData[targetIndex].site = newSite;
+                vaultData[targetIndex].url = newUrl;
+                vaultData[targetIndex].user = newUser;
+                vaultData[targetIndex].pass = newPass;
+                vaultData[targetIndex].updatedAt = Date.now();
+                saveDataToStorage(); 
+            }
+            editingId = null; renderVault();
+        }
+
+        function inlineCopy(element, text, label) {
+            if (editingId !== null) return;
+            navigator.clipboard.writeText(text);
+            if (element.querySelector('.copy-toast')) return;
+            const toast = document.createElement('span');
+            toast.className = 'copy-toast absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black bg-white text-black px-2 py-1 rounded shadow-lg z-10 uppercase tracking-widest';
+            toast.innerText = `✅ [${label}_COPIED]`;
+            element.appendChild(toast);
+            setTimeout(() => { toast.remove(); }, 1200);
+        }
+
+        function directCopy(text, label) { navigator.clipboard.writeText(text); }
+        function toggleRowPassword(id) {
+            const input = document.getElementById(`pw-${id}`); const icon = document.getElementById(`eye-${id}`);
+            input.type = input.type === 'password' ? 'text' : 'password';
+            icon.setAttribute('data-lucide', input.type === 'password' ? 'eye' : 'eye-off'); lucide.createIcons();
+        }
+
+        function saveCredentials(e) {
+            e.preventDefault();
+            const site = document.getElementById('siteName').value.trim();
+            const url = document.getElementById('siteUrl').value.trim();
+            const user = document.getElementById('siteUser').value.trim();
+            const pass = document.getElementById('sitePassword').value;
+
+            vaultData.push({ id: Date.now(), site, url, user, pass, updatedAt: Date.now() });
+            saveDataToStorage(); 
+            
+            document.getElementById('vaultForm').reset();
+            document.getElementById('sitePassword').type = 'password';
+            document.getElementById('inputPasswordEye').setAttribute('data-lucide', 'eye');
+            lucide.createIcons();
+        }
+
+        function deleteCredential(id) {
+            if(confirm('🚨 確定要永久刪除此憑證嗎？此操作不可逆！')) {
+                vaultData = vaultData.filter(item => item.id !== id);
+                saveDataToStorage(); 
+            }
+        }
+    </script>
+</body>
+</html>
