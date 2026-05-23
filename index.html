@@ -675,7 +675,6 @@
             let filteredData = vaultData.filter(item => item.site.toLowerCase().includes(query) || item.user.toLowerCase().includes(query));
             filteredData.sort((a, b) => a.site.localeCompare(b.site, 'en', { numeric: true, sensitivity: 'base' }));
             
-            // 🐛 數量更新
             const countElement = document.getElementById('totalCount');
             if (countElement) countElement.innerText = vaultData.length;
             
@@ -691,7 +690,25 @@
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-[#141824] transition-colors group border-l-2 border-transparent hover:border-[var(--neon-pink)]';
                 
+                // 🚀 關鍵邏輯：從 URL 提取主網域，如果沒有 URL 則使用原始 site 名稱
+                // 🚀 關鍵邏輯：從 URL 提取主網域，並移除後綴
+                let displaySite = item.site;
+                try {
+                    if (item.url && item.url.trim() !== "") {
+                        let urlToParse = item.url.startsWith('http') ? item.url : 'https://' + item.url;
+                        let hostname = new URL(urlToParse).hostname;
+                        // 移除 'www.' 並將域名後綴（如 .com, .net, .tw 等）移除
+                        displaySite = hostname.replace('www.', '').split('.')[0];
+                        
+                        // 讓首字母大寫，看起來更專業
+                        displaySite = displaySite.charAt(0).toUpperCase() + displaySite.slice(1);
+                    }
+                } catch (e) {
+                    // 若解析失敗，維持原始名稱
+                }
+
                 if (editingId === item.id) {
+                    // 編輯模式保持不變
                     tr.innerHTML = `
                         <td class="py-2.5 px-4 flex flex-col gap-1.5">
                             <input type="text" id="edit-site-${item.id}" value="${item.site}" placeholder="服務名稱" class="w-full rog-input rounded-md py-1.5 px-3 text-xs text-white focus:outline-none font-bold">
@@ -707,7 +724,7 @@
                         </td>
                     `;
                 } else {
-                    let siteDisplay = `<span class="font-bold text-white truncate">${item.site}</span>`;
+                    let siteDisplay = `<span class="font-bold text-white truncate">${displaySite}</span>`;
                     if(item.url) {
                         let safeUrl = item.url.startsWith('http') ? item.url : `https://${item.url}`;
                         siteDisplay += `<a href="${safeUrl}" target="_blank" title="前往網站" class="ml-2 text-slate-500 hover:neon-text-blue inline-block transition-colors"><i data-lucide="external-link" class="w-3.5 h-3.5"></i></a>`;
