@@ -476,12 +476,12 @@
         }
 
         async function onDriveConnected() {
-            // 🚀 將原本的綠色按鈕改為「金屬灰底 + 淺灰邊框」，並稍微降低透明度表示「已鎖定/已連線」
-            document.getElementById('authBtn').className = "w-full bg-[#262626] border border-[#525252] text-white text-[11px] font-bold py-2.5 px-3 rounded flex items-center justify-center gap-2 cursor-default opacity-90 transition-all";
-            document.getElementById('authBtn').innerHTML = `<i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> DRIVE LINKED SUCCESS`;
+            // 🚀 將背景與邊框改為 #005AB5 藍色
+            document.getElementById('authBtn').className = "w-full bg-[#005AB5] border border-[#005AB5] text-white text-[12px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center transition-colors flex items-center justify-center gap-1.5 cursor-default";
+            document.getElementById('authBtn').innerHTML = `<i data-lucide="cloud-check" class="w-4 h-4"></i> DRIVE LINKED SUCCESS`;
             
-            // 🚀 將閃爍的圓點綠燈改為「冷白/銀灰光」的脈衝效果
-            document.getElementById('syncPulse').className = "w-2 h-2 bg-gray-300 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.6)] animate-pulse";
+            // 💡 如果你希望左下角閃爍的小狀態燈也同步改成藍光，可以把這行也一起換掉：
+            document.getElementById('syncPulse').className = "w-2 h-2 bg-[#005AB5] rounded-full shadow-[0_0_8px_rgba(0,90,181,0.8)] animate-pulse";
             document.getElementById('engineStatus').innerText = "SYNCING WITH CLOUD...";
             
             lucide.createIcons();
