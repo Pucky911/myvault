@@ -632,6 +632,7 @@
                         if (confirm(`✅ 成功解析！已讀取到 ${parsedData.length} 筆憑證，是否加密寫入保險箱？`)) {
                             parsedData.forEach(pd => vaultData.push(pd));
                             saveDataToStorage(); // 統一呼叫加密存檔
+                            renderVault();       // 🚀 關鍵修復：通知畫面立即更新將資料畫出來
                         }
                     }
                 } catch (err) { alert('❌ 匯入失敗：' + err.message); }
@@ -793,10 +794,11 @@
             lucide.createIcons();
         }
 
-        function deleteCredential(id) {
+       function deleteCredential(id) {
             if(confirm('🚨 確定要永久刪除此憑證嗎？此操作不可逆！')) {
                 vaultData = vaultData.filter(item => item.id !== id);
                 saveDataToStorage(); // 加密存檔
+                renderVault();       // 🚀 關鍵修復：通知畫面立即更新
             }
         }
     </script>
