@@ -803,6 +803,31 @@
                 saveDataToStorage(); // 加密存檔
                 renderVault();       // 🚀 關鍵修復：通知畫面立即更新
             }
+    // 🚀 新增：清空所有資料的核彈按鈕
+        function clearAllCredentials() {
+            // 1. 先檢查有沒有資料可以刪
+            if (vaultData.length === 0) {
+                alert("保險箱已經是空的，無資料可清空！");
+                return;
+            }
+
+            // 2. 終極防呆驗證
+            const confirmMsg = "🚨【嚴重警告】🚨\n\n您確定要清空保險箱內的所有資料嗎？\n這將會同步抹除「本機端」與「雲端 Drive」的紀錄，此操作完全無法復原！\n\n如果您確定要銷毀所有資料，請在下方輸入大寫的「DELETE」：";
+            const userInput = prompt(confirmMsg);
+
+            // 3. 驗證通過才執行銷毀
+            if (userInput === "DELETE") {
+                vaultData = [];      // 將記憶體資料清空
+                saveDataToStorage(); // 將空狀態加密並強制寫入硬碟與雲端
+                renderVault();       // 更新畫面，讓所有資料消失
+                alert("✅ 系統重置完成：所有資料已成功銷毀，並同步更新至雲端。");
+            } else if (userInput !== null) {
+                // 輸入錯誤，但不是按取消
+                alert("❌ 驗證碼錯誤，安全防線未解除，資料保留。");
+            }
+        }
+
+           
         }
     </script>
 </body>
