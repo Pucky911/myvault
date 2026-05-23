@@ -235,7 +235,10 @@
                                 <input type="file" id="importFile" class="hidden" accept=".csv" onchange="importFromChromeCSV(event)">
                             </div>
                             <button onclick="changeMasterKey()" class="w-full border border-[var(--metal-edge)] hover:border-[var(--neon-purple)] hover:bg-[var(--neon-purple)]/10 neon-text-blue text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5">
-                                <i data-lucide="key" class="w-4 h-4"></i> CHANGE MASTER KEY // 修改主鑰
+                                <i data-lucide="key" class="w-4 h-4"></i> CHANGE MASTER KEY // 修改主金鑰
+                            </button>
+                            <button onclick="clearAllCredentials()" class="w-full bg-[#111111] hover:bg-[#330000] border border-[#333333] hover:border-red-500 text-gray-500 hover:text-white text-[11px] font-bold py-2.5 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5 mt-2">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i> DELETE ALL // 清空所有資料
                             </button>
                         </div>
                     </div>
@@ -246,7 +249,7 @@
                     
 <form id="vaultForm" onsubmit="saveCredentials(event)" class="space-y-4 text-xs">
     <div>
-        <label class="block text-[10px] font-bold text-[#a3a3a3] mb-1 uppercase tracking-widest">// name // 網站服務名稱</label>
+        <label class="block text-[10px] font-bold text-[#a3a3a3] mb-1 uppercase tracking-widest">// service name // 網站服務名稱</label>
         <input type="text" id="siteName" required placeholder="Google, Steam, Netflix" class="w-full custom-input rounded py-2 px-3 text-[#e5e5e5] placeholder-[#404040]">
     </div>
     <div>
@@ -275,7 +278,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-5">
                     <div>
                         <h2 class="text-lg font-bold text-white tracking-widest uppercase cyber-font">DECRYPTED CREDENTIALS // 金庫密碼 </h2>
-                        <p class="text-[11px] neon-text-blue mt-1 uppercase">CHROME CSV STANDARD // <span class="font-black text-white">(雙擊帳密可快速複製)</span></p>
+                        <p class="text-[11px] neon-text-blue mt-1 uppercase">CHROME CSV STANDARD // <span class="font-black text-white">(雙擊快速複製)</span></p>
                     </div>
                     
                     <div class="relative w-full sm:w-60">
@@ -795,7 +798,7 @@
         }
 
        function deleteCredential(id) {
-            if(confirm('🚨 確定要永久刪除此憑證嗎？此操作不可逆！')) {
+            if(confirm('🚨 永久刪除！')) {
                 vaultData = vaultData.filter(item => item.id !== id);
                 saveDataToStorage(); // 加密存檔
                 renderVault();       // 🚀 關鍵修復：通知畫面立即更新
