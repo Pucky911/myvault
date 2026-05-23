@@ -225,11 +225,11 @@
                             <button id="authBtn" onclick="handleAuthClick()" class="w-full bg-red-600 hover:bg-red-700 text-white text-[12px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors flex items-center justify-center gap-1.5">
                                 <i data-lucide="log-in" class="w-4 h-4"></i> CONNECT GOOGLE DRIVE
                             </button>
-                            <div class="grid grid-cols-2 gap-2.5">
-                                <button onclick="exportToChromeCSV()" class="bg-[#262626] hover:bg-slate-200 text-black text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
+                            <div class="grid grid-cols-2 gap-3">
+    <button onclick="exportToChromeCSV()" class="bg-[#262626] hover:bg-[#333333] border border-[#404040] hover:border-[#555555] text-white text-xs font-bold py-3 rounded transition-all cursor-pointer">
                                     匯出 REMIT
                                 </button>
-                                <button onclick="document.getElementById('importFile').click()" class="border border-[var(--metal-edge)] hover:border-white text-white text-[11px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center cursor-pointer transition-colors">
+                                <button onclick="document.getElementById('importFile').click()" class="bg-[#262626] hover:bg-[#333333] border border-[#404040] hover:border-[#555555] text-white text-xs font-bold py-3 rounded transition-all cursor-pointer">
                                     匯入 IMPORT
                                 </button>
                                 <input type="file" id="importFile" class="hidden" accept=".csv" onchange="importFromChromeCSV(event)">
@@ -476,10 +476,14 @@
         }
 
         async function onDriveConnected() {
-            document.getElementById('authBtn').className = "w-full bg-emerald-600 text-white text-[12px] font-bold py-2 px-3 rounded-md tracking-wider cyber-font text-center transition-colors flex items-center justify-center gap-1.5";
-            document.getElementById('authBtn').innerHTML = `<i data-lucide="cloud-check" class="w-4 h-4"></i> DRIVE LINKED SUCCESS`;
-            document.getElementById('syncPulse').className = "w-2 h-2 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse";
+            // 🚀 將原本的綠色按鈕改為「金屬灰底 + 淺灰邊框」，並稍微降低透明度表示「已鎖定/已連線」
+            document.getElementById('authBtn').className = "w-full bg-[#262626] border border-[#525252] text-white text-[11px] font-bold py-2.5 px-3 rounded flex items-center justify-center gap-2 cursor-default opacity-90 transition-all";
+            document.getElementById('authBtn').innerHTML = `<i data-lucide="cloud-check" class="w-3.5 h-3.5"></i> DRIVE LINKED SUCCESS`;
+            
+            // 🚀 將閃爍的圓點綠燈改為「冷白/銀灰光」的脈衝效果
+            document.getElementById('syncPulse').className = "w-2 h-2 bg-gray-300 rounded-full shadow-[0_0_8px_rgba(255,255,255,0.6)] animate-pulse";
             document.getElementById('engineStatus').innerText = "SYNCING WITH CLOUD...";
+            
             lucide.createIcons();
             await syncWithGoogleDrive();
         }
